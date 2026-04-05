@@ -97,7 +97,7 @@ export const BottleReturnForm = ({
 
     setIsSubmitting(true);
     try {
-      const result = await returnBottleUsage({
+      const mutationPromise = returnBottleUsage({
         data: {
           sessionToken,
           date,
@@ -105,22 +105,30 @@ export const BottleReturnForm = ({
           remaining_bottles: values.remaining_bottles,
           caps: values.caps,
         },
+      }).then((mutationResult) => {
+        if (!mutationResult.success) {
+          throw new Error(mutationResult.error);
+        }
+
+        return mutationResult;
       });
 
-      if (!result.success) {
-        setFormError(result.error);
-        toast.error(result.error);
-        return;
-      }
+      void toast.promise(mutationPromise, {
+        loading: "Saving bottle return...",
+        success: (mutationResult) => mutationResult.message ?? "Bottle return saved.",
+        error: (error) =>
+          error instanceof Error ? error.message : "Failed to return bottles.",
+      });
+
+      await mutationPromise;
 
       setValues({ empty_bottles: 0, remaining_bottles: 0, caps: 0 });
-      toast.success(result.message ?? "Bottle return saved.");
       onReturned?.();
     } catch (error) {
       console.error("Failed to return bottles", error);
-      const message = "Failed to return bottles.";
+      const message =
+        error instanceof Error ? error.message : "Failed to return bottles.";
       setFormError(message);
-      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }

@@ -97,24 +97,33 @@ export const DeliveryTable = ({ refreshKey = 0 }: DeliveryTableProps) => {
 
       setDeletingId(row.delivery.id);
       try {
-        const result = await deleteDailyDelivery({
+        const mutationPromise = deleteDailyDelivery({
           data: {
             sessionToken,
             delivery_id: row.delivery.id,
             date: row.delivery.delivery_date,
           },
+        }).then((mutationResult) => {
+          if (!mutationResult.success) {
+            throw new Error(mutationResult.error);
+          }
+
+          return mutationResult;
         });
 
-        if (!result.success) {
-          toast.error(result.error);
-          return;
-        }
+        void toast.promise(mutationPromise, {
+          loading: "Deleting delivery...",
+          success: (mutationResult) =>
+            mutationResult.message ?? "Delivery deleted successfully.",
+          error: (error) =>
+            error instanceof Error ? error.message : "Failed to delete delivery.",
+        });
 
-        toast.success(result.message ?? "Delivery deleted successfully.");
+        await mutationPromise;
+
         await loadDeliveries();
       } catch (error) {
         console.error("Failed to delete delivery", error);
-        toast.error("Failed to delete delivery.");
       } finally {
         setDeletingId(null);
       }
@@ -200,6 +209,9 @@ export const DeliveryTable = ({ refreshKey = 0 }: DeliveryTableProps) => {
               void handleDelete(row.original);
             }}
           >
+            {deletingId === row.original.delivery.id ? (
+              <Spinner className="size-4" />
+            ) : null}
             {deletingId === row.original.delivery.id ? "Deleting..." : "Delete"}
           </Button>
         ),

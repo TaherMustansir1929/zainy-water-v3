@@ -46,7 +46,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             },
           }}
         >
-          <Toaster position="bottom-right" closeButton />
+          <Toaster position="top-center" closeButton />
           {children}
         </ClerkProvider>
         <TanStackDevtools

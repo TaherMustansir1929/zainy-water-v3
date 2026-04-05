@@ -153,28 +153,37 @@ export const BottleUsageForm = () => {
 
     setIsSavingUsage(true);
     try {
-      const result = await addUpdateBottleUsage({
+      const mutationPromise = addUpdateBottleUsage({
         data: {
           sessionToken,
           date: dob,
           filled_bottles: usageValues.filled_bottles,
           caps: usageValues.caps,
         },
+      }).then((mutationResult) => {
+        if (!mutationResult.success) {
+          throw new Error(mutationResult.error);
+        }
+
+        return mutationResult;
       });
 
-      if (!result.success) {
-        setUsageFormError(result.error);
-        toast.error(result.error);
-        return;
-      }
+      void toast.promise(mutationPromise, {
+        loading: "Saving bottle usage...",
+        success: (mutationResult) =>
+          mutationResult.message ?? "Bottle usage saved successfully.",
+        error: (error) =>
+          error instanceof Error ? error.message : "Failed to save bottle usage.",
+      });
 
-      toast.success(result.message ?? "Bottle usage saved successfully.");
+      await mutationPromise;
+
       await loadData();
     } catch (error) {
       console.error("Failed to save bottle usage", error);
-      const message = "Failed to save bottle usage.";
+      const message =
+        error instanceof Error ? error.message : "Failed to save bottle usage.";
       setUsageFormError(message);
-      toast.error(message);
     } finally {
       setIsSavingUsage(false);
     }
@@ -196,24 +205,35 @@ export const BottleUsageForm = () => {
 
     setIsUpdatingStatus(true);
     try {
-      const result = await markAsDone({
+      const mutationPromise = markAsDone({
         data: {
           sessionToken,
           date: dob,
           done,
         },
+      }).then((mutationResult) => {
+        if (!mutationResult.success) {
+          throw new Error(mutationResult.error);
+        }
+
+        return mutationResult;
       });
 
-      if (!result.success) {
-        toast.error(result.error);
-        return;
-      }
+      void toast.promise(mutationPromise, {
+        loading: done ? "Marking as done..." : "Reverting status...",
+        success: (mutationResult) =>
+          mutationResult.message ?? (done ? "Marked as done." : "Reverted."),
+        error: (error) =>
+          error instanceof Error
+            ? error.message
+            : "Failed to update bottle usage status.",
+      });
 
-      toast.success(result.message ?? (done ? "Marked as done." : "Reverted."));
+      await mutationPromise;
+
       await loadData();
     } catch (error) {
       console.error("Failed to update bottle usage status", error);
-      toast.error("Failed to update bottle usage status.");
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -232,23 +252,32 @@ export const BottleUsageForm = () => {
 
     setIsDeletingUsage(true);
     try {
-      const result = await deleteBottleUsage({
+      const mutationPromise = deleteBottleUsage({
         data: {
           sessionToken,
           date: dob,
         },
+      }).then((mutationResult) => {
+        if (!mutationResult.success) {
+          throw new Error(mutationResult.error);
+        }
+
+        return mutationResult;
       });
 
-      if (!result.success) {
-        toast.error(result.error);
-        return;
-      }
+      void toast.promise(mutationPromise, {
+        loading: "Deleting bottle usage...",
+        success: (mutationResult) =>
+          mutationResult.message ?? "Bottle usage deleted successfully.",
+        error: (error) =>
+          error instanceof Error ? error.message : "Failed to delete bottle usage.",
+      });
 
-      toast.success(result.message ?? "Bottle usage deleted successfully.");
+      await mutationPromise;
+
       await loadData();
     } catch (error) {
       console.error("Failed to delete bottle usage", error);
-      toast.error("Failed to delete bottle usage.");
     } finally {
       setIsDeletingUsage(false);
     }
@@ -393,6 +422,9 @@ export const BottleUsageForm = () => {
             }}
             disabled={!view.usage || view.usage.done || isUpdatingStatus}
           >
+            {isUpdatingStatus && view.usage && !view.usage.done ? (
+              <Spinner className="size-4" />
+            ) : null}
             Mark As Done
           </Button>
           <Button
@@ -404,6 +436,7 @@ export const BottleUsageForm = () => {
             }}
             disabled={!view.usage || !view.usage.done || isUpdatingStatus}
           >
+            {isUpdatingStatus && view.usage?.done ? <Spinner className="size-4" /> : null}
             Revert
           </Button>
           <Button
@@ -415,6 +448,7 @@ export const BottleUsageForm = () => {
             }}
             disabled={!view.usage || view.usage.done || isDeletingUsage || isUpdatingStatus}
           >
+            {isDeletingUsage ? <Spinner className="size-4" /> : null}
             {isDeletingUsage ? "Deleting..." : "Delete Bottle Usage"}
           </Button>
         </div>

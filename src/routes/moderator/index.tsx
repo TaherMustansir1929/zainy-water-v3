@@ -2,10 +2,7 @@ import * as React from "react";
 import { Navigate, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import {
-  getModeratorSession,
-  moderatorLogout,
-} from "./login/-server/modMiddleware.function";
+import { getModeratorSession } from "./login/-server/modMiddleware.function";
 import { ModTabs } from "./-ui/mod-tabs";
 import { useModeratorSession } from "@/hooks/use-moderator-session";
 
@@ -18,7 +15,6 @@ function RouteComponent() {
   const {
     hasHydrated,
     isAuthenticated,
-    moderator,
     sessionToken,
     clearModeratorSession,
   } = useModeratorSession();

@@ -43,7 +43,19 @@ export function ModLoginForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        const response = await moderatorLogin({ data: value });
+        const loginPromise = moderatorLogin({ data: value });
+
+        void toast.promise(loginPromise, {
+          loading: "Signing in...",
+          success: (result) => `Welcome back, ${result.moderator.name}.`,
+          error: (error) => {
+            const message =
+              error instanceof Error ? error.message : GENERIC_AUTH_ERROR;
+            return message || GENERIC_AUTH_ERROR;
+          },
+        });
+
+        const response = await loginPromise;
 
         setSession({
           moderator: response.moderator,
@@ -52,11 +64,9 @@ export function ModLoginForm() {
           sessionToken: response.sessionToken,
         });
 
-        toast.success(`Welcome back, ${response.moderator.name}.`);
         await navigate({ to: "/moderator" });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : GENERIC_AUTH_ERROR;
-        toast.error(message || GENERIC_AUTH_ERROR);
+      } catch {
+        // Errors are already surfaced via toast.promise.
       }
     },
   });

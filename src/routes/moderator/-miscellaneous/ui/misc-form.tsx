@@ -75,28 +75,44 @@ export const MiscForm = ({ onAdded }: MiscFormProps) => {
 				return;
 			}
 
-			const result = await addMiscDelivery({
-				data: {
-					sessionToken,
-					customer_name: value.customer_name.trim(),
-					description: value.description.trim(),
-					filled_bottles: value.filled_bottles,
-					empty_bottles: value.empty_bottles,
-					damaged_bottles: value.damaged_bottles,
-					isPaid: value.isPaid,
-					payment: value.isPaid ? value.payment : 0,
-					delivery_date: dob,
-				},
-			});
+      try {
+        await toast.promise(
+          addMiscDelivery({
+            data: {
+              sessionToken,
+              customer_name: value.customer_name.trim(),
+              description: value.description.trim(),
+              filled_bottles: value.filled_bottles,
+              empty_bottles: value.empty_bottles,
+              damaged_bottles: value.damaged_bottles,
+              isPaid: value.isPaid,
+              payment: value.isPaid ? value.payment : 0,
+              delivery_date: dob,
+            },
+          }).then((mutationResult) => {
+            if (!mutationResult.success) {
+              throw new Error(mutationResult.error);
+            }
 
-			if (!result.success) {
-				toast.error(result.error);
-				return;
-			}
+            return mutationResult;
+          }),
+          {
+            loading: "Saving miscellaneous delivery...",
+            success: (mutationResult) =>
+              mutationResult.message ??
+              "Miscellaneous delivery added successfully.",
+            error: (error) =>
+              error instanceof Error
+                ? error.message
+                : "Failed to add miscellaneous delivery.",
+          },
+        );
 
-			toast.success(result.message ?? "Miscellaneous delivery added successfully.");
-			form.reset();
-			onAdded?.();
+        form.reset();
+        onAdded?.();
+      } catch (error) {
+        console.error("Failed to add miscellaneous delivery", error);
+      }
 		},
 	});
 

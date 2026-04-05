@@ -66,24 +66,39 @@ export const OtherExpenseForm = ({ onAdded }: OtherExpenseFormProps) => {
         return;
       }
 
-      const result = await addOtherExpense({
-        data: {
-          sessionToken,
-          date: dob,
-          refilled_bottles: value.refilled_bottles,
-          amount: value.amount,
-          description: value.description.trim(),
-        },
-      });
+      try {
+        await toast.promise(
+          addOtherExpense({
+            data: {
+              sessionToken,
+              date: dob,
+              refilled_bottles: value.refilled_bottles,
+              amount: value.amount,
+              description: value.description.trim(),
+            },
+          }).then((mutationResult) => {
+            if (!mutationResult.success) {
+              throw new Error(mutationResult.error);
+            }
 
-      if (!result.success) {
-        toast.error(result.error);
-        return;
+            return mutationResult;
+          }),
+          {
+            loading: "Saving other expense...",
+            success: (mutationResult) =>
+              mutationResult.message ?? "Other expense added successfully.",
+            error: (error) =>
+              error instanceof Error
+                ? error.message
+                : "Failed to add other expense.",
+          },
+        );
+
+        form.reset();
+        onAdded?.();
+      } catch (error) {
+        console.error("Failed to add other expense", error);
       }
-
-      toast.success(result.message ?? "Other expense added successfully.");
-      form.reset();
-      onAdded?.();
     },
   });
 

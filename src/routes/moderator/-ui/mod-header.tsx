@@ -1,10 +1,13 @@
 "use client";
 
+import * as React from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { moderatorLogout } from "../login/-server/modMiddleware.function";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useModeratorSession } from "@/hooks/use-moderator-session";
 
@@ -12,6 +15,7 @@ import { useModeratorSession } from "@/hooks/use-moderator-session";
 export const ModHeader = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false);
   const {
     hasHydrated,
     isAuthenticated,
@@ -29,11 +33,18 @@ export const ModHeader = () => {
     const ok = await logout_confirm();
     if (!ok) return;
 
+    setIsLoggingOut(true);
     try {
       if (sessionToken) {
-        await moderatorLogout({ data: { sessionToken } });
+        await toast.promise(moderatorLogout({ data: { sessionToken } }), {
+          loading: "Signing out...",
+          success: "Signed out successfully.",
+          error: (error) =>
+            error instanceof Error ? error.message : "Signed out locally.",
+        });
       }
     } finally {
+      setIsLoggingOut(false);
       clearModeratorSession();
       await navigate({ to: "/moderator/login", replace: true });
     }
@@ -53,8 +64,15 @@ export const ModHeader = () => {
       </h1>
 
       {isAuthenticated && pathname !== "/moderator/login" && (
-        <Button variant="outline" size={"sm"} onClick={handleLogout} className="shadow-sm">
-          Logout
+        <Button
+          variant="outline"
+          size={"sm"}
+          onClick={handleLogout}
+          className="shadow-sm"
+          disabled={isLoggingOut}
+        >
+          {isLoggingOut ? <Spinner className="size-4" /> : null}
+          {isLoggingOut ? "Logging Out..." : "Logout"}
         </Button>
       )}
     </header>

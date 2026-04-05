@@ -1,5 +1,5 @@
-import { Moderator } from "@/modules/admin/add-moderator/ui/columns";
 import { create } from "zustand";
+import type { ModeratorState } from "./moderator-state";
 
 export type AddModDrawerState = {
   isEditOpen: boolean;
@@ -7,8 +7,8 @@ export type AddModDrawerState = {
   openEditDrawer: () => void;
   openAddDrawer: () => void;
   closeDrawer: () => void;
-  mod_data: Moderator | null;
-  setModData: (data: Moderator) => void;
+  mod_data: ModeratorState | null;
+  setModData: (data: ModeratorState) => void;
 };
 
 export const useAddModDrawer = create<AddModDrawerState>((set) => ({
@@ -18,5 +18,5 @@ export const useAddModDrawer = create<AddModDrawerState>((set) => ({
   openAddDrawer: () => set({ isAddOpen: true }),
   closeDrawer: () => set({ isEditOpen: false, isAddOpen: false }),
   mod_data: null,
-  setModData: (data: Moderator) => set({ mod_data: data }),
+  setModData: (data: ModeratorState) => set({ mod_data: data }),
 }));

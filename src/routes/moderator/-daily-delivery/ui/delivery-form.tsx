@@ -109,31 +109,47 @@ export const DeliveryForm = ({ onAdded }: DeliveryFormProps) => {
         return;
       }
 
-      const result = await addDailyDelivery({
-        data: {
-          sessionToken,
-          delivery_date: dob,
-          customer_id: selectedCustomer.customer_id,
-          filled_bottles: value.filled_bottles,
-          empty_bottles: value.empty_bottles,
-          deposit_bottles_given: value.deposit_bottles_given,
-          deposit_bottles_taken: value.deposit_bottles_taken,
-          foc: value.foc,
-          damaged_bottles: value.damaged_bottles,
-          payment: value.payment,
-        },
-      });
+      try {
+        const mutationPromise = addDailyDelivery({
+          data: {
+            sessionToken,
+            delivery_date: dob,
+            customer_id: selectedCustomer.customer_id,
+            filled_bottles: value.filled_bottles,
+            empty_bottles: value.empty_bottles,
+            deposit_bottles_given: value.deposit_bottles_given,
+            deposit_bottles_taken: value.deposit_bottles_taken,
+            foc: value.foc,
+            damaged_bottles: value.damaged_bottles,
+            payment: value.payment,
+          },
+        }).then((mutationResult) => {
+          if (!mutationResult.success) {
+            throw new Error(mutationResult.error);
+          }
 
-      if (!result.success) {
-        toast.error(result.error);
-        return;
+          return mutationResult;
+        });
+
+        void toast.promise(mutationPromise, {
+          loading: "Saving delivery...",
+          success: (mutationResult) =>
+            mutationResult.message ?? "Delivery record added successfully.",
+          error: (error) =>
+            error instanceof Error
+              ? error.message
+              : "Failed to add delivery.",
+        });
+
+        await mutationPromise;
+
+        form.reset();
+        form.setFieldValue("customer_id", "");
+        setSelectedCustomer(null);
+        onAdded?.();
+      } catch (error) {
+        console.error("Failed to add delivery", error);
       }
-
-      toast.success(result.message ?? "Delivery record added successfully.");
-      form.reset();
-      form.setFieldValue("customer_id", "");
-      setSelectedCustomer(null);
-      onAdded?.();
     },
   });
 
