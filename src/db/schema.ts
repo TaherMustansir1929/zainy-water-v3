@@ -26,6 +26,8 @@ export const Admin = pgTable(
     name: text("name").notNull(),
     clerk_id: varchar("clerk_id", { length: 255 }).notNull().unique(),
     isAuthorized: boolean("isAuthorized").notNull().default(false),
+    authorizedByKeyId: varchar("authorizedByKeyId"),
+    authorizedAt: timestamp("authorizedAt", { withTimezone: true }),
     createdAt: timestamp("createdAt", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -36,6 +38,42 @@ export const Admin = pgTable(
   (table) => [
     index("admin_id_idx").on(table.id),
     index("admin_clerk_id_idx").on(table.clerk_id),
+    index("admin_authorized_by_key_id_idx").on(table.authorizedByKeyId),
+  ]
+);
+
+// Developer access key table
+export const DeveloperAccessKey = pgTable(
+  "DeveloperAccessKey",
+  {
+    id: varchar("id")
+      .primaryKey()
+      .$defaultFn(() => cuid()),
+    label: varchar("label", { length: 255 }),
+    developerKey: text("plainKey").notNull().unique(),
+    expirationDate: timestamp("expiresAt", { withTimezone: true }).notNull(),
+    usedAt: timestamp("usedAt", { withTimezone: true }),
+    usedByClerkId: varchar("usedByClerkId", { length: 255 }),
+    usedByAdminId: varchar("usedByAdminId"),
+    isActive: boolean("isActive").notNull().default(true),
+    revokedAt: timestamp("revokedAt", { withTimezone: true }),
+    revokedReason: text("revokedReason"),
+    createdAt: timestamp("createdAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updatedAt", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("developer_access_key_id_idx").on(table.id),
+    index("developer_access_key_expires_at_idx").on(table.expirationDate),
+    index("developer_access_key_is_active_idx").on(table.isActive),
+    foreignKey({
+      columns: [table.usedByAdminId],
+      foreignColumns: [Admin.id],
+      name: "developer_access_key_used_by_admin_fk",
+    }).onDelete("set null"),
   ]
 );
 
@@ -289,3 +327,17 @@ export const miscellaneousRelations = relations(Miscellaneous, ({ one }) => ({
     references: [Moderator.id],
   }),
 }));
+
+export const adminRelations = relations(Admin, ({ many }) => ({
+  consumedDeveloperKeys: many(DeveloperAccessKey),
+}));
+
+export const developerAccessKeyRelations = relations(
+  DeveloperAccessKey,
+  ({ one }) => ({
+    usedByAdmin: one(Admin, {
+      fields: [DeveloperAccessKey.usedByAdminId],
+      references: [Admin.id],
+    }),
+  })
+);
