@@ -8,61 +8,154 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as IndexRouteImport } from "./routes/index"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as ModeratorRouteRouteImport } from './routes/moderator/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ModeratorIndexRouteImport } from './routes/moderator/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ModeratorLoginIndexRouteImport } from './routes/moderator/login/index'
 
-const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+const ModeratorRouteRoute = ModeratorRouteRouteImport.update({
+  id: '/moderator',
+  path: '/moderator',
   getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModeratorIndexRoute = ModeratorIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ModeratorRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ModeratorLoginIndexRoute = ModeratorLoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => ModeratorRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
+  '/': typeof IndexRoute
+  '/moderator': typeof ModeratorRouteRouteWithChildren
+  '/admin/': typeof AdminIndexRoute
+  '/moderator/': typeof ModeratorIndexRoute
+  '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
+  '/': typeof IndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/moderator': typeof ModeratorIndexRoute
+  '/moderator/login': typeof ModeratorLoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
+  '/': typeof IndexRoute
+  '/moderator': typeof ModeratorRouteRouteWithChildren
+  '/admin/': typeof AdminIndexRoute
+  '/moderator/': typeof ModeratorIndexRoute
+  '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/"
+  fullPaths:
+    | '/'
+    | '/moderator'
+    | '/admin/'
+    | '/moderator/'
+    | '/moderator/login/'
   fileRoutesByTo: FileRoutesByTo
-  to: "/"
-  id: "__root__" | "/"
+  to: '/' | '/admin' | '/moderator' | '/moderator/login'
+  id:
+    | '__root__'
+    | '/'
+    | '/moderator'
+    | '/admin/'
+    | '/moderator/'
+    | '/moderator/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ModeratorRouteRoute: typeof ModeratorRouteRouteWithChildren
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
+    '/moderator': {
+      id: '/moderator'
+      path: '/moderator'
+      fullPath: '/moderator'
+      preLoaderRoute: typeof ModeratorRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/moderator/': {
+      id: '/moderator/'
+      path: '/'
+      fullPath: '/moderator/'
+      preLoaderRoute: typeof ModeratorIndexRouteImport
+      parentRoute: typeof ModeratorRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/moderator/login/': {
+      id: '/moderator/login/'
+      path: '/login'
+      fullPath: '/moderator/login/'
+      preLoaderRoute: typeof ModeratorLoginIndexRouteImport
+      parentRoute: typeof ModeratorRouteRoute
     }
   }
 }
 
+interface ModeratorRouteRouteChildren {
+  ModeratorIndexRoute: typeof ModeratorIndexRoute
+  ModeratorLoginIndexRoute: typeof ModeratorLoginIndexRoute
+}
+
+const ModeratorRouteRouteChildren: ModeratorRouteRouteChildren = {
+  ModeratorIndexRoute: ModeratorIndexRoute,
+  ModeratorLoginIndexRoute: ModeratorLoginIndexRoute,
+}
+
+const ModeratorRouteRouteWithChildren = ModeratorRouteRoute._addFileChildren(
+  ModeratorRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ModeratorRouteRoute: ModeratorRouteRouteWithChildren,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx"
-import type { createStart } from "@tanstack/react-start"
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

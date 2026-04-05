@@ -1,4 +1,5 @@
-import { useState, JSX } from "react";
+import { useState } from "react";
+import type {JSX} from "react";
 
 import { Button } from "@/components/ui/button";
 import {
