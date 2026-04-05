@@ -1,7 +1,8 @@
-import { ClerkLoaded, ClerkLoading, UserButton } from "@clerk/tanstack-react-start";
+import { ClerkLoaded, ClerkLoading, SignOutButton } from "@clerk/tanstack-react-start";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { UserCircleIcon } from "@hugeicons/core-free-icons";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 export function AdminHeader() {
   return (
@@ -12,7 +13,9 @@ export function AdminHeader() {
         <HugeiconsIcon icon={UserCircleIcon} />
       </ClerkLoading>
       <ClerkLoaded>
-        <UserButton />
+        <Button className={"shadow-sm"} variant="outline">
+        <SignOutButton children="Log out"/>
+        </Button>
       </ClerkLoaded>
     </header>
   );

@@ -1,9 +1,12 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { WelcomeSection } from '../-ui/welcome-section';
+import { Suspense } from "react";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/admin/moderators')({
+import { WelcomeSection } from "../-ui/welcome-section";
+import { LoadingState } from "@/components/web/loading-state";
+
+export const Route = createFileRoute("/admin/moderators")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return (
@@ -12,7 +15,9 @@ function RouteComponent() {
         text="Here you can manage moderators for your platform. You can add, edit, and
         remove moderators as needed."
       />
-      <Outlet />
+      <Suspense fallback={<LoadingState message="Loading moderators..." />}>
+        <Outlet />
+      </Suspense>
     </main>
   );
 }

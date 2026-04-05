@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { WelcomeSection } from "../-ui/welcome-section";
 import { getDashboardAnalytics } from "./-server/getDashboardAnalytics.function";
 import { DashboardAnalyticsSection } from "./-ui/dashboard-analytics";
+import { LoadingState } from "@/components/web/loading-state";
 
 export const Route = createFileRoute("/admin/dashboard/")({
   loader: async () => {
@@ -23,7 +25,9 @@ function DashboardPage() {
         }
         greeting="Welcome"
       />
-      <DashboardAnalyticsSection analytics={analytics} />
+      <Suspense fallback={<LoadingState message="Loading dashboard analytics..." />}>
+        <DashboardAnalyticsSection analytics={analytics} />
+      </Suspense>
     </main>
   );
 }
