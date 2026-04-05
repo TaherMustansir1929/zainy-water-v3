@@ -12,7 +12,6 @@ const SESSION_TTL_MS = 1000 * 60 * 60 * 12;
 const MAX_LOGIN_ATTEMPTS = 5;
 const ATTEMPT_WINDOW_MS = 1000 * 60 * 15;
 const COOLDOWN_MS = 1000 * 5;
-const HASH_PREFIX = "scrypt";
 const SESSION_HMAC_ALGORITHM = "sha256";
 
 const MODERATOR_SESSION_SECRET =
@@ -125,30 +124,6 @@ function isSessionTokenRevoked(sessionToken: string): boolean {
 	return true;
 }
 
-function hashPassword(password: string, salt?: string): string {
-	const derivedSalt = salt ?? crypto.randomBytes(16).toString("hex");
-	const hash = crypto.scryptSync(password, derivedSalt, 64).toString("hex");
-	return `${HASH_PREFIX}$${derivedSalt}$${hash}`;
-}
-
-function verifyScryptPassword(password: string, storedHash: string): boolean {
-	const [prefix, salt, hash] = storedHash.split("$");
-
-	if (prefix !== HASH_PREFIX || !salt || !hash) {
-		return false;
-	}
-
-	const calculatedHash = crypto
-		.scryptSync(password, salt, Buffer.from(hash, "hex").length)
-		.toString("hex");
-
-	return safeEqual(calculatedHash, hash);
-}
-
-function isScryptHash(value: string): boolean {
-	return value.startsWith(`${HASH_PREFIX}$`);
-}
-
 function getAttemptsKey(name: string): string {
 	return name.toLocaleLowerCase("en-US");
 }
@@ -183,31 +158,14 @@ function clearAttempts(key: string): void {
 	loginAttempts.delete(key);
 }
 
-async function verifyModeratorPassword(args: {
-	moderatorId: string;
+function verifyModeratorPassword(args: {
 	storedPassword: string;
 	inputPassword: string;
-}): Promise<boolean> {
-	const { moderatorId, storedPassword, inputPassword } = args;
+}): boolean {
+	const { storedPassword, inputPassword } = args;
 
-	if (isScryptHash(storedPassword)) {
-		return verifyScryptPassword(inputPassword, storedPassword);
-	}
-
-	const isValidLegacyPassword = safeEqual(storedPassword, inputPassword);
-	if (!isValidLegacyPassword) {
-		return false;
-	}
-
-	await db
-		.update(Moderator)
-		.set({
-			password: hashPassword(inputPassword),
-			updatedAt: new Date(),
-		})
-		.where(eq(Moderator.id, moderatorId));
-
-	return true;
+	// Keep login side-effect free; do not rewrite stored credentials during auth.
+	return safeEqual(storedPassword, inputPassword);
 }
 
 export const requireModeratorAuthMiddleware = createMiddleware({ type: "function" })
@@ -291,8 +249,7 @@ export const moderatorLogin = createServerFn({ method: "POST" })
 
 		const moderator = moderators[0];
 
-		const isValidPassword = await verifyModeratorPassword({
-			moderatorId: moderator.id,
+		const isValidPassword = verifyModeratorPassword({
 			storedPassword: moderator.password,
 			inputPassword: data.password,
 		});
@@ -327,7 +284,7 @@ export const moderatorLogin = createServerFn({ method: "POST" })
 
 export const getModeratorSession = createServerFn({ method: "POST" })
 	.middleware([requireModeratorAuthMiddleware])
-	.handler(async ({ context }) => {
+	.handler(({ context }) => {
 		return {
 			moderator: context.moderator,
 			issuedAt: context.moderatorSession.issuedAt,
@@ -337,7 +294,7 @@ export const getModeratorSession = createServerFn({ method: "POST" })
 
 export const moderatorLogout = createServerFn({ method: "POST" })
 	.inputValidator(moderatorSessionTokenSchema)
-	.handler(async ({ data }) => {
+	.handler(({ data }) => {
 		const sessionPayload = readSessionToken(data.sessionToken);
 		if (sessionPayload && sessionPayload.expiresAt > Date.now()) {
 			revokeSessionToken(data.sessionToken, sessionPayload.expiresAt);

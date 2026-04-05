@@ -23,7 +23,6 @@ export const Route = createFileRoute("/_auth/callback")({
 });
 
 function CallbackRouteComponent() {
-  const { userId } = Route.useLoaderData();
   const navigate = useNavigate();
   const [developerKey, setDeveloperKey] = React.useState("");
   const [isSubmitting, setIsSubmitting] = React.useState(false);

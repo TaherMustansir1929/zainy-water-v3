@@ -15,9 +15,11 @@ import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ModeratorIndexRouteImport } from './routes/moderator/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AuthCallbackRouteImport } from './routes/_auth/callback'
+import { Route as AdminModeratorsRouteRouteImport } from './routes/admin/moderators/route'
 import { Route as ModeratorLoginIndexRouteImport } from './routes/moderator/login/index'
+import { Route as AdminModeratorsIndexRouteImport } from './routes/admin/moderators/index'
+import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
 import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
 import { Route as AuthSignInSplatRouteImport } from './routes/_auth/sign-in.$'
 
@@ -50,20 +52,30 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/callback',
   path: '/callback',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AdminModeratorsRouteRoute = AdminModeratorsRouteRouteImport.update({
+  id: '/moderators',
+  path: '/moderators',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const ModeratorLoginIndexRoute = ModeratorLoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
   getParentRoute: () => ModeratorRouteRoute,
+} as any)
+const AdminModeratorsIndexRoute = AdminModeratorsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminModeratorsRouteRoute,
+} as any)
+const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AuthSignUpSplatRoute = AuthSignUpSplatRouteImport.update({
   id: '/sign-up/$',
@@ -80,22 +92,25 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/moderator': typeof ModeratorRouteRouteWithChildren
+  '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/callback': typeof AuthCallbackRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/': typeof AdminIndexRoute
   '/moderator/': typeof ModeratorIndexRoute
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
+  '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/callback': typeof AuthCallbackRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin': typeof AdminIndexRoute
   '/moderator': typeof ModeratorIndexRoute
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
+  '/admin/dashboard': typeof AdminDashboardIndexRoute
+  '/admin/moderators': typeof AdminModeratorsIndexRoute
   '/moderator/login': typeof ModeratorLoginIndexRoute
 }
 export interface FileRoutesById {
@@ -104,12 +119,14 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/moderator': typeof ModeratorRouteRouteWithChildren
+  '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/_auth/callback': typeof AuthCallbackRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/': typeof AdminIndexRoute
   '/moderator/': typeof ModeratorIndexRoute
   '/_auth/sign-in/$': typeof AuthSignInSplatRoute
   '/_auth/sign-up/$': typeof AuthSignUpSplatRoute
+  '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
 export interface FileRouteTypes {
@@ -118,22 +135,25 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/moderator'
+    | '/admin/moderators'
     | '/callback'
-    | '/admin/dashboard'
     | '/admin/'
     | '/moderator/'
     | '/sign-in/$'
     | '/sign-up/$'
+    | '/admin/dashboard/'
+    | '/admin/moderators/'
     | '/moderator/login/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/callback'
-    | '/admin/dashboard'
     | '/admin'
     | '/moderator'
     | '/sign-in/$'
     | '/sign-up/$'
+    | '/admin/dashboard'
+    | '/admin/moderators'
     | '/moderator/login'
   id:
     | '__root__'
@@ -141,12 +161,14 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/admin'
     | '/moderator'
+    | '/admin/moderators'
     | '/_auth/callback'
-    | '/admin/dashboard'
     | '/admin/'
     | '/moderator/'
     | '/_auth/sign-in/$'
     | '/_auth/sign-up/$'
+    | '/admin/dashboard/'
+    | '/admin/moderators/'
     | '/moderator/login/'
   fileRoutesById: FileRoutesById
 }
@@ -201,13 +223,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/dashboard': {
-      id: '/admin/dashboard'
-      path: '/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
     '/_auth/callback': {
       id: '/_auth/callback'
       path: '/callback'
@@ -215,12 +230,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/admin/moderators': {
+      id: '/admin/moderators'
+      path: '/moderators'
+      fullPath: '/admin/moderators'
+      preLoaderRoute: typeof AdminModeratorsRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/moderator/login/': {
       id: '/moderator/login/'
       path: '/login'
       fullPath: '/moderator/login/'
       preLoaderRoute: typeof ModeratorLoginIndexRouteImport
       parentRoute: typeof ModeratorRouteRoute
+    }
+    '/admin/moderators/': {
+      id: '/admin/moderators/'
+      path: '/'
+      fullPath: '/admin/moderators/'
+      preLoaderRoute: typeof AdminModeratorsIndexRouteImport
+      parentRoute: typeof AdminModeratorsRouteRoute
+    }
+    '/admin/dashboard/': {
+      id: '/admin/dashboard/'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard/'
+      preLoaderRoute: typeof AdminDashboardIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/_auth/sign-up/$': {
       id: '/_auth/sign-up/$'
@@ -255,14 +291,27 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface AdminModeratorsRouteRouteChildren {
+  AdminModeratorsIndexRoute: typeof AdminModeratorsIndexRoute
+}
+
+const AdminModeratorsRouteRouteChildren: AdminModeratorsRouteRouteChildren = {
+  AdminModeratorsIndexRoute: AdminModeratorsIndexRoute,
+}
+
+const AdminModeratorsRouteRouteWithChildren =
+  AdminModeratorsRouteRoute._addFileChildren(AdminModeratorsRouteRouteChildren)
+
 interface AdminRouteRouteChildren {
-  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminModeratorsRouteRoute: typeof AdminModeratorsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminDashboardRoute: AdminDashboardRoute,
+  AdminModeratorsRouteRoute: AdminModeratorsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminDashboardIndexRoute: AdminDashboardIndexRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
