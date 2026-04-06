@@ -50,6 +50,7 @@ export const DobSelector = () => {
                 }}
                 defaultMonth={dob ?? new Date()}
                 disabled={(date) => date > new Date()}
+                captionLayout="dropdown"
               />
             </PopoverContent>
           </Popover>

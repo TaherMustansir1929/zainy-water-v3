@@ -15,7 +15,7 @@ function AdminLayout() {
     <SidebarProvider>
       <main className="flex min-h-screen w-full justify-between">
         <AppSidebar />
-        <div className="flex w-full flex-1 flex-col gap-2">
+        <div className="flex min-w-0 w-full flex-1 flex-col gap-2">
           <AdminHeader />
           <Outlet />
         </div>
