@@ -17,8 +17,10 @@ import { Route as ModeratorIndexRouteImport } from './routes/moderator/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AuthCallbackRouteImport } from './routes/_auth/callback'
 import { Route as AdminModeratorsRouteRouteImport } from './routes/admin/moderators/route'
+import { Route as AdminExpensesRouteRouteImport } from './routes/admin/expenses/route'
 import { Route as ModeratorLoginIndexRouteImport } from './routes/moderator/login/index'
 import { Route as AdminModeratorsIndexRouteImport } from './routes/admin/moderators/index'
+import { Route as AdminExpensesIndexRouteImport } from './routes/admin/expenses/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
 import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
 import { Route as AuthSignInSplatRouteImport } from './routes/_auth/sign-in.$'
@@ -62,6 +64,11 @@ const AdminModeratorsRouteRoute = AdminModeratorsRouteRouteImport.update({
   path: '/moderators',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminExpensesRouteRoute = AdminExpensesRouteRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const ModeratorLoginIndexRoute = ModeratorLoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
@@ -71,6 +78,11 @@ const AdminModeratorsIndexRoute = AdminModeratorsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminModeratorsRouteRoute,
+} as any)
+const AdminExpensesIndexRoute = AdminExpensesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminExpensesRouteRoute,
 } as any)
 const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   id: '/dashboard/',
@@ -92,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/moderator': typeof ModeratorRouteRouteWithChildren
+  '/admin/expenses': typeof AdminExpensesRouteRouteWithChildren
   '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/callback': typeof AuthCallbackRoute
   '/admin/': typeof AdminIndexRoute
@@ -99,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/expenses/': typeof AdminExpensesIndexRoute
   '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
@@ -110,6 +124,7 @@ export interface FileRoutesByTo {
   '/sign-in/$': typeof AuthSignInSplatRoute
   '/sign-up/$': typeof AuthSignUpSplatRoute
   '/admin/dashboard': typeof AdminDashboardIndexRoute
+  '/admin/expenses': typeof AdminExpensesIndexRoute
   '/admin/moderators': typeof AdminModeratorsIndexRoute
   '/moderator/login': typeof ModeratorLoginIndexRoute
 }
@@ -119,6 +134,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/moderator': typeof ModeratorRouteRouteWithChildren
+  '/admin/expenses': typeof AdminExpensesRouteRouteWithChildren
   '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/_auth/callback': typeof AuthCallbackRoute
   '/admin/': typeof AdminIndexRoute
@@ -126,6 +142,7 @@ export interface FileRoutesById {
   '/_auth/sign-in/$': typeof AuthSignInSplatRoute
   '/_auth/sign-up/$': typeof AuthSignUpSplatRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/expenses/': typeof AdminExpensesIndexRoute
   '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
@@ -135,6 +152,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/moderator'
+    | '/admin/expenses'
     | '/admin/moderators'
     | '/callback'
     | '/admin/'
@@ -142,6 +160,7 @@ export interface FileRouteTypes {
     | '/sign-in/$'
     | '/sign-up/$'
     | '/admin/dashboard/'
+    | '/admin/expenses/'
     | '/admin/moderators/'
     | '/moderator/login/'
   fileRoutesByTo: FileRoutesByTo
@@ -153,6 +172,7 @@ export interface FileRouteTypes {
     | '/sign-in/$'
     | '/sign-up/$'
     | '/admin/dashboard'
+    | '/admin/expenses'
     | '/admin/moderators'
     | '/moderator/login'
   id:
@@ -161,6 +181,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/admin'
     | '/moderator'
+    | '/admin/expenses'
     | '/admin/moderators'
     | '/_auth/callback'
     | '/admin/'
@@ -168,6 +189,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-in/$'
     | '/_auth/sign-up/$'
     | '/admin/dashboard/'
+    | '/admin/expenses/'
     | '/admin/moderators/'
     | '/moderator/login/'
   fileRoutesById: FileRoutesById
@@ -237,6 +259,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminModeratorsRouteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/expenses': {
+      id: '/admin/expenses'
+      path: '/expenses'
+      fullPath: '/admin/expenses'
+      preLoaderRoute: typeof AdminExpensesRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/moderator/login/': {
       id: '/moderator/login/'
       path: '/login'
@@ -250,6 +279,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/moderators/'
       preLoaderRoute: typeof AdminModeratorsIndexRouteImport
       parentRoute: typeof AdminModeratorsRouteRoute
+    }
+    '/admin/expenses/': {
+      id: '/admin/expenses/'
+      path: '/'
+      fullPath: '/admin/expenses/'
+      preLoaderRoute: typeof AdminExpensesIndexRouteImport
+      parentRoute: typeof AdminExpensesRouteRoute
     }
     '/admin/dashboard/': {
       id: '/admin/dashboard/'
@@ -291,6 +327,17 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface AdminExpensesRouteRouteChildren {
+  AdminExpensesIndexRoute: typeof AdminExpensesIndexRoute
+}
+
+const AdminExpensesRouteRouteChildren: AdminExpensesRouteRouteChildren = {
+  AdminExpensesIndexRoute: AdminExpensesIndexRoute,
+}
+
+const AdminExpensesRouteRouteWithChildren =
+  AdminExpensesRouteRoute._addFileChildren(AdminExpensesRouteRouteChildren)
+
 interface AdminModeratorsRouteRouteChildren {
   AdminModeratorsIndexRoute: typeof AdminModeratorsIndexRoute
 }
@@ -303,12 +350,14 @@ const AdminModeratorsRouteRouteWithChildren =
   AdminModeratorsRouteRoute._addFileChildren(AdminModeratorsRouteRouteChildren)
 
 interface AdminRouteRouteChildren {
+  AdminExpensesRouteRoute: typeof AdminExpensesRouteRouteWithChildren
   AdminModeratorsRouteRoute: typeof AdminModeratorsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminExpensesRouteRoute: AdminExpensesRouteRouteWithChildren,
   AdminModeratorsRouteRoute: AdminModeratorsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,

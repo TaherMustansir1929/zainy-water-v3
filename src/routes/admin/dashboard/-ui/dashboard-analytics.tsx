@@ -83,8 +83,16 @@ function formatBottles(value: number) {
   return `${formatNumber(value)} bottles`;
 }
 
-function ScrambleValue({ value, format }: { value: number; format: MetricFormat }) {
-  const [display, setDisplay] = React.useState(() => formatMetricValue(0, format));
+function ScrambleValue({
+  value,
+  format,
+}: {
+  value: number;
+  format: MetricFormat;
+}) {
+  const [display, setDisplay] = React.useState(() =>
+    formatMetricValue(0, format)
+  );
 
   React.useEffect(() => {
     let frame = 0;
@@ -111,7 +119,7 @@ function ScrambleValue({ value, format }: { value: number; format: MetricFormat 
     };
   }, [format, value]);
 
-  return <span className="tabular-nums">{display}</span>;
+  return <span className="tabular-nums font-heading text-3xl">{display}</span>;
 }
 
 export function DashboardAnalyticsSection({ analytics }: Props) {
@@ -277,53 +285,61 @@ export function DashboardAnalyticsSection({ analytics }: Props) {
           <Card
             key={card.id}
             className={cn(
-              "relative overflow-hidden border-border/60 bg-white/75 backdrop-blur-sm",
+              "relative overflow-hidden border-border/60 bg-white/75 ",
               "shadow-[inset_0_1px_4px_rgba(0,0,0,0.12)]"
             )}
           >
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-white/75 to-transparent" />
-              <CardHeader className="relative pb-2">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <CardDescription className="truncate">{card.description}</CardDescription>
-                    <CardTitle className="mt-1 text-sm font-medium text-muted-foreground">
-                      {card.title}
-                    </CardTitle>
-                  </div>
-                  <Link
-                    to={card.href}
-                    aria-label={`Open ${card.title}`}
-                    className={cn(
-                      "inline-flex rounded-xl border bg-background/85 p-2.5 backdrop-blur",
-                      "shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                      card.tone === "revenue" && "border-emerald-500/40 text-emerald-500",
-                      card.tone === "expense" && "border-destructive/40 text-destructive",
-                      !card.tone && "border-border/60 text-foreground"
-                    )}
-                  >
-                    <HugeiconsIcon icon={card.icon} strokeWidth={2} className="size-4" />
-                  </Link>
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-white/75 to-transparent" />
+            <CardHeader className="relative pb-2">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <CardDescription className="truncate">
+                    {card.description}
+                  </CardDescription>
+                  <CardTitle className="mt-1 text-sm font-medium text-muted-foreground">
+                    {card.title}
+                  </CardTitle>
                 </div>
-              </CardHeader>
-              <CardContent className="relative pb-2">
-                <p
+                <Link
+                  to={card.href}
+                  aria-label={`Open ${card.title}`}
                   className={cn(
-                    "text-2xl font-semibold tracking-tight",
-                    card.tone === "revenue" && "text-emerald-500",
-                    card.tone === "expense" && "text-destructive"
+                    "inline-flex rounded-xl border bg-background/85 p-2.5 backdrop-blur",
+                    "shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md",
+                    "focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+                    card.tone === "revenue" &&
+                      "border-emerald-500/40 text-emerald-500",
+                    card.tone === "expense" &&
+                      "border-destructive/40 text-destructive",
+                    !card.tone && "border-border/60 text-foreground"
                   )}
                 >
-                  <ScrambleValue value={card.value} format={card.format} />
-                </p>
-              </CardContent>
-              <CardFooter className="relative pt-0 text-xs text-muted-foreground">
-                {card.footer}
-              </CardFooter>
+                  <HugeiconsIcon
+                    icon={card.icon}
+                    strokeWidth={2}
+                    className="size-4"
+                  />
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="relative pb-2">
+              <p
+                className={cn(
+                  "text-2xl font-semibold tracking-tight",
+                  card.tone === "revenue" && "text-emerald-500",
+                  card.tone === "expense" && "text-destructive"
+                )}
+              >
+                <ScrambleValue value={card.value} format={card.format} />
+              </p>
+            </CardContent>
+            <CardFooter className="relative pt-0 text-xs text-muted-foreground">
+              {card.footer}
+            </CardFooter>
           </Card>
         ))}
       </section>
-
+      {/* CHARTS */}
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <Card
           className={cn(
@@ -344,20 +360,42 @@ export function DashboardAnalyticsSection({ analytics }: Props) {
             >
               <BarChart data={financeComparisonData} barCategoryGap={30}>
                 <defs>
-                  <linearGradient id="financeRevenueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="financeRevenueGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="5%" stopColor="#34d399" stopOpacity={1} />
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0.82} />
                   </linearGradient>
-                  <linearGradient id="financeExpenseGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="financeExpenseGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="5%" stopColor="#fb7185" stopOpacity={1} />
                     <stop offset="95%" stopColor="#e11d48" stopOpacity={0.84} />
                   </linearGradient>
-                  <linearGradient id="financeDepositGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="financeDepositGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="5%" stopColor="#22d3ee" stopOpacity={1} />
                     <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.84} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid vertical={false} stroke="#7dd3fc" strokeDasharray="5 5" />
+                <CartesianGrid
+                  vertical={false}
+                  stroke="#7dd3fc"
+                  strokeDasharray="5 5"
+                />
                 <XAxis
                   dataKey="period"
                   tickLine={false}
@@ -385,7 +423,9 @@ export function DashboardAnalyticsSection({ analytics }: Props) {
                               ]
                             : undefined;
                         const label =
-                          configEntry !== undefined ? configEntry.label : typedName;
+                          configEntry !== undefined
+                            ? configEntry.label
+                            : typedName;
 
                         return (
                           <div className="flex w-full min-w-36 items-center justify-between gap-3">
@@ -399,10 +439,24 @@ export function DashboardAnalyticsSection({ analytics }: Props) {
                     />
                   }
                 />
-                <ChartLegend content={<ChartLegendContent className="text-cyan-700" />} />
-                <Bar dataKey="revenue" fill="url(#financeRevenueGradient)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="expenses" fill="url(#financeExpenseGradient)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="deposits" fill="url(#financeDepositGradient)" radius={[8, 8, 0, 0]} />
+                <ChartLegend
+                  content={<ChartLegendContent className="text-cyan-700" />}
+                />
+                <Bar
+                  dataKey="revenue"
+                  fill="url(#financeRevenueGradient)"
+                  radius={[8, 8, 0, 0]}
+                />
+                <Bar
+                  dataKey="expenses"
+                  fill="url(#financeExpenseGradient)"
+                  radius={[8, 8, 0, 0]}
+                />
+                <Bar
+                  dataKey="deposits"
+                  fill="url(#financeDepositGradient)"
+                  radius={[8, 8, 0, 0]}
+                />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -416,7 +470,9 @@ export function DashboardAnalyticsSection({ analytics }: Props) {
         >
           <CardHeader>
             <CardTitle>Bottle Distribution</CardTitle>
-            <CardDescription>Current split of available, used and damaged bottles.</CardDescription>
+            <CardDescription>
+              Current split of available, used and damaged bottles.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer
@@ -425,15 +481,33 @@ export function DashboardAnalyticsSection({ analytics }: Props) {
             >
               <PieChart>
                 <defs>
-                  <linearGradient id="bottleAvailableGradient" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient
+                    id="bottleAvailableGradient"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor="#4ade80" stopOpacity={1} />
                     <stop offset="100%" stopColor="#16a34a" stopOpacity={0.9} />
                   </linearGradient>
-                  <linearGradient id="bottleUsedGradient" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient
+                    id="bottleUsedGradient"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor="#818cf8" stopOpacity={1} />
                     <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.9} />
                   </linearGradient>
-                  <linearGradient id="bottleDamagedGradient" x1="0" y1="0" x2="1" y2="1">
+                  <linearGradient
+                    id="bottleDamagedGradient"
+                    x1="0"
+                    y1="0"
+                    x2="1"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor="#fb923c" stopOpacity={1} />
                     <stop offset="100%" stopColor="#f97316" stopOpacity={0.9} />
                   </linearGradient>
@@ -455,7 +529,12 @@ export function DashboardAnalyticsSection({ analytics }: Props) {
                   }
                 />
                 <ChartLegend
-                  content={<ChartLegendContent nameKey="status" className="text-emerald-700" />}
+                  content={
+                    <ChartLegendContent
+                      nameKey="status"
+                      className="text-emerald-700"
+                    />
+                  }
                 />
                 <Pie
                   data={bottleDistributionData}
