@@ -2,15 +2,17 @@
 
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { startOfDay, subDays } from "date-fns";
+import { isSameDay, startOfDay, subDays } from "date-fns";
 import { toast } from "sonner";
 
+import { deleteExpense } from "./-server/deleteExpense.function";
 import { getExpenses } from "./-server/getExpenses.function";
 import { updateExpense } from "./-server/updateExpense.function";
 import { ExpenseForm } from "./-ui/expense-form";
 import { ExpenseTable } from "./-ui/expense-table";
 import type { AdminExpenseRecord } from "./-server/getExpenses.function";
 import type { ExpenseFormValues } from "./-ui/expense-form";
+import { useConfirm } from "@/hooks/use-confirm";
 
 async function loadExpenses(): Promise<Array<AdminExpenseRecord>> {
   return await getExpenses();
@@ -65,6 +67,12 @@ function RouteComponent() {
   const [isEditOpen, setIsEditOpen] = React.useState(false);
   const [selectedExpense, setSelectedExpense] = React.useState<AdminExpenseRecord | null>(null);
 
+  const [DeleteConfirmDialog, confirmDelete] = useConfirm(
+    "Delete expense?",
+    "This action is permanent and cannot be undone.",
+    true,
+  );
+
   const lastThirtyDaySummary = React.useMemo(() => {
     const from = subDays(startOfDay(new Date()), 29);
     const filtered = expenses.filter((expense) => expense.createdAt >= from);
@@ -116,8 +124,44 @@ function RouteComponent() {
     [refreshExpenses, selectedExpense],
   );
 
+  const handleDeleteExpense = React.useCallback(async () => {
+    if (!selectedExpense) {
+      return;
+    }
+
+    if (!isSameDay(selectedExpense.createdAt, new Date())) {
+      toast.error("Record is immutable, hence cannot be edited.");
+      return;
+    }
+
+    const confirmed = (await confirmDelete()) as boolean;
+    if (!confirmed) {
+      return;
+    }
+
+    const mutationPromise = deleteExpense({
+      data: {
+        expenseId: selectedExpense.id,
+        moderatorId: selectedExpense.moderatorId,
+      },
+    });
+
+    void toast.promise(mutationPromise, {
+      loading: "Deleting expense...",
+      success: "Expense deleted successfully.",
+      error: (error) => (error instanceof Error ? error.message : "Failed to delete expense."),
+    });
+
+    await mutationPromise;
+    setIsEditOpen(false);
+    setSelectedExpense(null);
+    await refreshExpenses();
+  }, [confirmDelete, refreshExpenses, selectedExpense]);
+
   return (
     <main className="flex w-full flex-col items-center gap-4 p-4">
+      <DeleteConfirmDialog />
+
       <section className="w-full max-w-7xl px-4 py-6">
         <h1 className="text-balance text-xl leading-tight font-medium sm:text-2xl">
           You have <ScrambleNumber value={lastThirtyDaySummary.count} /> expenses totaling at <span className="text-destructive sm:text-3xl">Rs.</span> <ScrambleNumber value={lastThirtyDaySummary.total} /> for last 30 days.
@@ -145,6 +189,7 @@ function RouteComponent() {
         }}
         expense={selectedExpense}
         onSubmit={handleEditExpense}
+        onDelete={handleDeleteExpense}
       />
     </main>
   );

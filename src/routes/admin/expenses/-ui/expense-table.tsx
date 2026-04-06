@@ -14,6 +14,8 @@ import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
   ArrowUp01Icon,
+  CheckmarkCircle03Icon,
+  Loading03Icon,
   SearchIcon,
   UnfoldMoreIcon,
 } from "@hugeicons/core-free-icons";
@@ -47,7 +49,7 @@ const pageSize = 20;
 type ExpenseStatusFilter = "all" | "today" | "done";
 
 function isExpenseEditable(record: AdminExpenseRecord): boolean {
-  return isSameDay(record.createdAt, new Date());
+  return isSameDay(record.date, new Date());
 }
 
 function getExpenseStatusLabel(record: AdminExpenseRecord): "Today's expense" | "Done" {
@@ -158,8 +160,18 @@ export const ExpenseTable = ({
         header: ({ column }) => <SortableHeader column={column} title="Status" />,
         cell: ({ row }) => {
           const isEditable = isExpenseEditable(row.original);
+
           return (
-            <Badge variant={isEditable ? "secondary" : "outline"}>
+            <Badge
+              variant="outline"
+              className={isEditable ? "border-muted-foreground/40" : "border-emerald-500 text-emerald-600"}
+            >
+              <HugeiconsIcon
+                icon={isEditable ? Loading03Icon : CheckmarkCircle03Icon}
+                strokeWidth={2}
+                data-icon="inline-start"
+                className={isEditable ? "animate-spin text-muted-foreground" : "text-emerald-500"}
+              />
               {getExpenseStatusLabel(row.original)}
             </Badge>
           );

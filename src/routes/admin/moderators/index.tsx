@@ -19,6 +19,7 @@ import {
   CancelCircleHalfDotIcon,
   CheckmarkCircle03Icon,
   Delete02Icon,
+  Loading03Icon,
   MinusSignIcon,
   MoreHorizontalCircle01Icon,
   PlusSignCircleIcon,
@@ -525,11 +526,28 @@ function ModeratorDataTable({
       {
         accessorKey: "isWorking",
         header: ({ column }) => <SortableHeader column={column} title="Status" />,
-        cell: ({ row }) => (
-          <Badge variant={row.original.isWorking ? "secondary" : "destructive"}>
-            {row.original.isWorking ? "Working" : "Removed"}
-          </Badge>
-        ),
+        cell: ({ row }) => {
+          const isWorking = row.original.isWorking;
+
+          return (
+            <Badge
+              variant="outline"
+              className={
+                isWorking
+                  ? "border-muted-foreground/40"
+                  : "border-destructive text-destructive"
+              }
+            >
+              <HugeiconsIcon
+                icon={isWorking ? Loading03Icon : CancelCircleHalfDotIcon}
+                strokeWidth={2}
+                data-icon="inline-start"
+                className={isWorking ? "animate-spin text-muted-foreground" : "text-destructive"}
+              />
+              {isWorking ? "Working" : "Removed"}
+            </Badge>
+          );
+        },
       },
       {
         id: "actions",

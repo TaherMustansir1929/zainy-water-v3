@@ -35,9 +35,18 @@ type ExpenseFormProps = {
   onOpenChange: (open: boolean) => void;
   expense: AdminExpenseRecord | null;
   onSubmit: (values: ExpenseFormValues) => Promise<void>;
+  onDelete?: () => Promise<void>;
 };
 
-export const ExpenseForm = ({ open, onOpenChange, expense, onSubmit }: ExpenseFormProps) => {
+export const ExpenseForm = ({
+  open,
+  onOpenChange,
+  expense,
+  onSubmit,
+  onDelete,
+}: ExpenseFormProps) => {
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
   const defaultValues = React.useMemo<ExpenseFormValues>(
     () => ({
       amount: expense?.amount ?? 0,
@@ -77,6 +86,19 @@ export const ExpenseForm = ({ open, onOpenChange, expense, onSubmit }: ExpenseFo
       form.reset(defaultValues);
     }
   }, [defaultValues, form, open]);
+
+  const handleDelete = React.useCallback(async () => {
+    if (!onDelete || isImmutable) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await onDelete();
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [isImmutable, onDelete]);
 
   const statusLabel = isImmutable ? "Done" : "Today's expense";
 
@@ -214,6 +236,23 @@ export const ExpenseForm = ({ open, onOpenChange, expense, onSubmit }: ExpenseFo
             )}
           />
         </form>
+
+        {onDelete ? (
+          <div className="px-6 pb-6">
+            <Button
+              type="button"
+              variant="destructive"
+              className="w-full shadow-sm"
+              disabled={isDeleting || isImmutable || !expense}
+              onClick={() => {
+                void handleDelete();
+              }}
+            >
+              {isDeleting ? <Spinner className="size-4" /> : null}
+              {isDeleting ? "Deleting..." : "Delete Expense"}
+            </Button>
+          </div>
+        ) : null}
       </SheetContent>
     </Sheet>
   );

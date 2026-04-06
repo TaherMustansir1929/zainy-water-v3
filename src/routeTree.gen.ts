@@ -18,10 +18,12 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AuthCallbackRouteImport } from './routes/_auth/callback'
 import { Route as AdminModeratorsRouteRouteImport } from './routes/admin/moderators/route'
 import { Route as AdminExpensesRouteRouteImport } from './routes/admin/expenses/route'
+import { Route as AdminDeliveriesRouteRouteImport } from './routes/admin/deliveries/route'
 import { Route as AdminCustomersRouteRouteImport } from './routes/admin/customers/route'
 import { Route as ModeratorLoginIndexRouteImport } from './routes/moderator/login/index'
 import { Route as AdminModeratorsIndexRouteImport } from './routes/admin/moderators/index'
 import { Route as AdminExpensesIndexRouteImport } from './routes/admin/expenses/index'
+import { Route as AdminDeliveriesIndexRouteImport } from './routes/admin/deliveries/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
 import { Route as AdminCustomersIndexRouteImport } from './routes/admin/customers/index'
 import { Route as AuthSignUpSplatRouteImport } from './routes/_auth/sign-up.$'
@@ -71,6 +73,11 @@ const AdminExpensesRouteRoute = AdminExpensesRouteRouteImport.update({
   path: '/expenses',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminDeliveriesRouteRoute = AdminDeliveriesRouteRouteImport.update({
+  id: '/deliveries',
+  path: '/deliveries',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminCustomersRouteRoute = AdminCustomersRouteRouteImport.update({
   id: '/customers',
   path: '/customers',
@@ -90,6 +97,11 @@ const AdminExpensesIndexRoute = AdminExpensesIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminExpensesRouteRoute,
+} as any)
+const AdminDeliveriesIndexRoute = AdminDeliveriesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminDeliveriesRouteRoute,
 } as any)
 const AdminDashboardIndexRoute = AdminDashboardIndexRouteImport.update({
   id: '/dashboard/',
@@ -117,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/moderator': typeof ModeratorRouteRouteWithChildren
   '/admin/customers': typeof AdminCustomersRouteRouteWithChildren
+  '/admin/deliveries': typeof AdminDeliveriesRouteRouteWithChildren
   '/admin/expenses': typeof AdminExpensesRouteRouteWithChildren
   '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/callback': typeof AuthCallbackRoute
@@ -126,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/sign-up/$': typeof AuthSignUpSplatRoute
   '/admin/customers/': typeof AdminCustomersIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/deliveries/': typeof AdminDeliveriesIndexRoute
   '/admin/expenses/': typeof AdminExpensesIndexRoute
   '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
@@ -139,6 +153,7 @@ export interface FileRoutesByTo {
   '/sign-up/$': typeof AuthSignUpSplatRoute
   '/admin/customers': typeof AdminCustomersIndexRoute
   '/admin/dashboard': typeof AdminDashboardIndexRoute
+  '/admin/deliveries': typeof AdminDeliveriesIndexRoute
   '/admin/expenses': typeof AdminExpensesIndexRoute
   '/admin/moderators': typeof AdminModeratorsIndexRoute
   '/moderator/login': typeof ModeratorLoginIndexRoute
@@ -150,6 +165,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/moderator': typeof ModeratorRouteRouteWithChildren
   '/admin/customers': typeof AdminCustomersRouteRouteWithChildren
+  '/admin/deliveries': typeof AdminDeliveriesRouteRouteWithChildren
   '/admin/expenses': typeof AdminExpensesRouteRouteWithChildren
   '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/_auth/callback': typeof AuthCallbackRoute
@@ -159,6 +175,7 @@ export interface FileRoutesById {
   '/_auth/sign-up/$': typeof AuthSignUpSplatRoute
   '/admin/customers/': typeof AdminCustomersIndexRoute
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
+  '/admin/deliveries/': typeof AdminDeliveriesIndexRoute
   '/admin/expenses/': typeof AdminExpensesIndexRoute
   '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
@@ -170,6 +187,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/moderator'
     | '/admin/customers'
+    | '/admin/deliveries'
     | '/admin/expenses'
     | '/admin/moderators'
     | '/callback'
@@ -179,6 +197,7 @@ export interface FileRouteTypes {
     | '/sign-up/$'
     | '/admin/customers/'
     | '/admin/dashboard/'
+    | '/admin/deliveries/'
     | '/admin/expenses/'
     | '/admin/moderators/'
     | '/moderator/login/'
@@ -192,6 +211,7 @@ export interface FileRouteTypes {
     | '/sign-up/$'
     | '/admin/customers'
     | '/admin/dashboard'
+    | '/admin/deliveries'
     | '/admin/expenses'
     | '/admin/moderators'
     | '/moderator/login'
@@ -202,6 +222,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/moderator'
     | '/admin/customers'
+    | '/admin/deliveries'
     | '/admin/expenses'
     | '/admin/moderators'
     | '/_auth/callback'
@@ -211,6 +232,7 @@ export interface FileRouteTypes {
     | '/_auth/sign-up/$'
     | '/admin/customers/'
     | '/admin/dashboard/'
+    | '/admin/deliveries/'
     | '/admin/expenses/'
     | '/admin/moderators/'
     | '/moderator/login/'
@@ -288,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminExpensesRouteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/deliveries': {
+      id: '/admin/deliveries'
+      path: '/deliveries'
+      fullPath: '/admin/deliveries'
+      preLoaderRoute: typeof AdminDeliveriesRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/customers': {
       id: '/admin/customers'
       path: '/customers'
@@ -315,6 +344,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/expenses/'
       preLoaderRoute: typeof AdminExpensesIndexRouteImport
       parentRoute: typeof AdminExpensesRouteRoute
+    }
+    '/admin/deliveries/': {
+      id: '/admin/deliveries/'
+      path: '/'
+      fullPath: '/admin/deliveries/'
+      preLoaderRoute: typeof AdminDeliveriesIndexRouteImport
+      parentRoute: typeof AdminDeliveriesRouteRoute
     }
     '/admin/dashboard/': {
       id: '/admin/dashboard/'
@@ -374,6 +410,17 @@ const AdminCustomersRouteRouteChildren: AdminCustomersRouteRouteChildren = {
 const AdminCustomersRouteRouteWithChildren =
   AdminCustomersRouteRoute._addFileChildren(AdminCustomersRouteRouteChildren)
 
+interface AdminDeliveriesRouteRouteChildren {
+  AdminDeliveriesIndexRoute: typeof AdminDeliveriesIndexRoute
+}
+
+const AdminDeliveriesRouteRouteChildren: AdminDeliveriesRouteRouteChildren = {
+  AdminDeliveriesIndexRoute: AdminDeliveriesIndexRoute,
+}
+
+const AdminDeliveriesRouteRouteWithChildren =
+  AdminDeliveriesRouteRoute._addFileChildren(AdminDeliveriesRouteRouteChildren)
+
 interface AdminExpensesRouteRouteChildren {
   AdminExpensesIndexRoute: typeof AdminExpensesIndexRoute
 }
@@ -398,6 +445,7 @@ const AdminModeratorsRouteRouteWithChildren =
 
 interface AdminRouteRouteChildren {
   AdminCustomersRouteRoute: typeof AdminCustomersRouteRouteWithChildren
+  AdminDeliveriesRouteRoute: typeof AdminDeliveriesRouteRouteWithChildren
   AdminExpensesRouteRoute: typeof AdminExpensesRouteRouteWithChildren
   AdminModeratorsRouteRoute: typeof AdminModeratorsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -406,6 +454,7 @@ interface AdminRouteRouteChildren {
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminCustomersRouteRoute: AdminCustomersRouteRouteWithChildren,
+  AdminDeliveriesRouteRoute: AdminDeliveriesRouteRouteWithChildren,
   AdminExpensesRouteRoute: AdminExpensesRouteRouteWithChildren,
   AdminModeratorsRouteRoute: AdminModeratorsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
