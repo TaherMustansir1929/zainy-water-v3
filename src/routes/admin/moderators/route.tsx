@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-import { WelcomeSection } from "../-ui/welcome-section";
+import { WelcomeSection } from "../utils/-ui/welcome-section";
 import { LoadingState } from "@/components/web/loading-state";
 
 export const Route = createFileRoute("/admin/moderators")({

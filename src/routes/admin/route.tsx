@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
-import { requireAdminAuthorization } from "./-server/admin-auth.function";
-import { AdminHeader } from "./-ui/admin-header";
+import { requireAdminAuthorization } from "./utils/-server/admin-auth.function";
+import { AdminHeader } from "./utils/-ui/admin-header";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 

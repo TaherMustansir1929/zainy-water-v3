@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
-import { requireAdminAuthorization } from "../../-server/admin-auth.function";
+import { requireAdminAuthorization } from "../../utils/-server/admin-auth.function";
 import { db } from "@/db";
 import { Area, Moderator } from "@/db/schema";
 

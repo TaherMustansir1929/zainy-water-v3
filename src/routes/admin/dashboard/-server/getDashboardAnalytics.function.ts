@@ -3,7 +3,7 @@ import { subDays } from "date-fns";
 import { and, count, desc, eq, gte, lte } from "drizzle-orm";
 import { z } from "zod";
 
-import { requireAdminAuthorization } from "../../-server/admin-auth.function";
+import { requireAdminAuthorization } from "../../utils/-server/admin-auth.function";
 import { db } from "@/db";
 import {
 	Customer,

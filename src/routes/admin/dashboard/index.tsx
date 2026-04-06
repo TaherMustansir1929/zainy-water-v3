@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { WelcomeSection } from "../-ui/welcome-section";
+import { WelcomeSection } from "../utils/-ui/welcome-section";
 import { getDashboardAnalytics } from "./-server/getDashboardAnalytics.function";
 import { DashboardAnalyticsSection } from "./-ui/dashboard-analytics";
 import { LoadingState } from "@/components/web/loading-state";
