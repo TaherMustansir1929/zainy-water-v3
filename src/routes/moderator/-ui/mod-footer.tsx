@@ -7,7 +7,9 @@ type Props = {
 export const MainFooter = ({ className }: Props) => {
   return (
     <footer className={cn("", className)}>
-      <sup>AK</sup>Neotech&trade; &bull; All Rights Reserved &copy; 2025
+      All Rights Reserved &copy; 2026. Developed by <a href="https://github.com/TaherMustansir1929" target="_blank" rel="noopener noreferrer" className="underline">
+        @zeoxd
+      </a>
     </footer>
   );
 };

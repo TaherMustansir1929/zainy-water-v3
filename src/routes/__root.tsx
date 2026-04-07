@@ -7,6 +7,12 @@ import { shadcn } from "@clerk/themes"
 import appCss from "../styles.css?url"
 import { Toaster } from "@/components/ui/sonner"
 
+const SITE_NAME = `${process.env.NODE_ENV === "development" && "[DEV]"} Zainy Water v3`
+const SITE_DESCRIPTION =
+  "Bottle supply management system for Zainy Water, built with TanStack Start"
+const SITE_URL = "https://zainy-water.vercel.app"
+const OG_IMAGE_URL = "https://zainy-water.vercel.app/logo.jpg";
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -18,13 +24,77 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: SITE_NAME,
+      },
+      {
+        name: "description",
+        content: SITE_DESCRIPTION,
+      },
+      {
+        name: "robots",
+        content: "index,follow",
+      },
+      {
+        name: "theme-color",
+        content: "#0095ff",
+      },
+      {
+        name: "format-detection",
+        content: "telephone=no",
+      },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        property: "og:site_name",
+        content: SITE_NAME,
+      },
+      {
+        property: "og:title",
+        content: SITE_NAME,
+      },
+      {
+        property: "og:description",
+        content: SITE_DESCRIPTION,
+      },
+      {
+        property: "og:url",
+        content: SITE_URL,
+      },
+      {
+        property: "og:image",
+        content: OG_IMAGE_URL,
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:title",
+        content: SITE_NAME,
+      },
+      {
+        name: "twitter:description",
+        content: SITE_DESCRIPTION,
+      },
+      {
+        name: "twitter:image",
+        content: OG_IMAGE_URL,
       },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "canonical",
+        href: SITE_URL,
+      },
+      {
+        rel: "manifest",
+        href: "/manifest.json",
       },
     ],
   }),
