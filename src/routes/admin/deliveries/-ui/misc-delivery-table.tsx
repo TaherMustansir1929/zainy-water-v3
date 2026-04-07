@@ -42,9 +42,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { GeneratedAvatar } from "@/lib/avatar";
 
 const pageSize = 20;
+type DeliveryStatusFilter = "all" | "today" | "done";
 
 function formatCurrency(value: number): string {
 	return new Intl.NumberFormat("en-PK", {
@@ -108,6 +110,19 @@ export const MiscDeliveryTable = ({
 }: MiscDeliveryTableProps) => {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
 	const [globalFilter, setGlobalFilter] = React.useState("");
+	const [statusFilter, setStatusFilter] = React.useState<DeliveryStatusFilter>("all");
+
+	const statusFilteredData = React.useMemo(() => {
+		if (statusFilter === "all") {
+			return data;
+		}
+
+		if (statusFilter === "today") {
+			return data.filter((record) => isDeliveryEditable(record));
+		}
+
+		return data.filter((record) => !isDeliveryEditable(record));
+	}, [data, statusFilter]);
 
 	const columns = React.useMemo<Array<ColumnDef<MiscDeliveryRecord>>>(
 		() => [
@@ -202,7 +217,7 @@ export const MiscDeliveryTable = ({
 	);
 
 	const table = useReactTable({
-		data,
+		data: statusFilteredData,
 		columns,
 		state: {
 			sorting,
@@ -245,21 +260,37 @@ export const MiscDeliveryTable = ({
 				</div>
 			</div>
 
-			<div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-				<div className="relative w-full max-w-sm">
-					<HugeiconsIcon
-						icon={SearchIcon}
-						strokeWidth={2}
-						className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-					/>
-					<Input
-						value={globalFilter}
-						onChange={(event) => {
-							setGlobalFilter(event.target.value);
+			<div className="mb-4 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+				<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+					<div className="relative w-full max-w-sm">
+						<HugeiconsIcon
+							icon={SearchIcon}
+							strokeWidth={2}
+							className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+						/>
+						<Input
+							value={globalFilter}
+							onChange={(event) => {
+								setGlobalFilter(event.target.value);
+							}}
+							placeholder="Search by customer, moderator or description"
+							className="pl-9"
+						/>
+					</div>
+
+					<ToggleGroup
+						value={[statusFilter]}
+						onValueChange={(values) => {
+							const next = values.at(0) as DeliveryStatusFilter | undefined;
+							setStatusFilter(next ?? "all");
 						}}
-						placeholder="Search by customer, moderator or description"
-						className="pl-9"
-					/>
+						variant="outline"
+						size="sm"
+					>
+						<ToggleGroupItem value="all">All</ToggleGroupItem>
+						<ToggleGroupItem value="today">Today's delivery</ToggleGroupItem>
+						<ToggleGroupItem value="done">Done</ToggleGroupItem>
+					</ToggleGroup>
 				</div>
 				<Badge variant="outline" className="w-fit">{`${table.getFilteredRowModel().rows.length} records`}</Badge>
 			</div>

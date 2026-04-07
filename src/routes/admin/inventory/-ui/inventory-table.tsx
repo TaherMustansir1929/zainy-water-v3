@@ -20,10 +20,10 @@ import {
   UnfoldMoreIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { format, isSameDay } from "date-fns";
+import { format } from "date-fns";
 
 import type { Column, ColumnDef, SortingState } from "@tanstack/react-table";
-import type { DailyDeliveryRecord } from "../-server/getDailyDeliveries.function";
+import type { InventoryBottleUsageRecord } from "../-server/getBottleUsageRecords.function";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,7 +46,6 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { GeneratedAvatar } from "@/lib/avatar";
 
 const pageSize = 20;
-type DeliveryStatusFilter = "all" | "today" | "done";
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat("en-PK", {
@@ -56,8 +55,16 @@ function formatCurrency(value: number): string {
   }).format(value);
 }
 
-function isDeliveryEditable(record: DailyDeliveryRecord): boolean {
-  return isSameDay(record.deliveryDate, new Date());
+type InventoryActivityFilter = "all" | "nonZero";
+
+function isZeroActivity(record: InventoryBottleUsageRecord): boolean {
+  return (
+    record.filled === 0 &&
+    record.empty === 0 &&
+    record.emptyReturned === 0 &&
+    record.remainingReturned === 0 &&
+    record.capsTaken === 0
+  );
 }
 
 function SortableHeader<TData, TValue>({
@@ -93,45 +100,41 @@ function SortableHeader<TData, TValue>({
   );
 }
 
-type DailyDeliveryTableProps = {
+type InventoryTableProps = {
   title: string;
   description: string;
-  data: Array<DailyDeliveryRecord>;
+  data: Array<InventoryBottleUsageRecord>;
   isLoading: boolean;
-  onEdit: (delivery: DailyDeliveryRecord) => void;
+  onEdit: (usage: InventoryBottleUsageRecord) => void;
 };
 
-export const DailyDeliveryTable = ({
+export const InventoryTable = ({
   title,
   description,
   data,
   isLoading,
   onEdit,
-}: DailyDeliveryTableProps) => {
+}: InventoryTableProps) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState<DeliveryStatusFilter>("all");
+  const [activityFilter, setActivityFilter] = React.useState<InventoryActivityFilter>("all");
 
-  const statusFilteredData = React.useMemo(() => {
-    if (statusFilter === "all") {
+  const filteredData = React.useMemo(() => {
+    if (activityFilter === "all") {
       return data;
     }
 
-    if (statusFilter === "today") {
-      return data.filter((record) => isDeliveryEditable(record));
-    }
+    return data.filter((record) => !isZeroActivity(record));
+  }, [activityFilter, data]);
 
-    return data.filter((record) => !isDeliveryEditable(record));
-  }, [data, statusFilter]);
-
-  const columns = React.useMemo<Array<ColumnDef<DailyDeliveryRecord>>>(
+  const columns = React.useMemo<Array<ColumnDef<InventoryBottleUsageRecord>>>(
     () => [
       {
-        accessorKey: "customerName",
-        header: ({ column }) => <SortableHeader column={column} title="Customer" />,
+        accessorKey: "moderatorName",
+        header: ({ column }) => <SortableHeader column={column} title="Moderator" />,
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <GeneratedAvatar seed={row.original.customerName} className="size-8" />
+            <GeneratedAvatar seed={row.original.moderatorName} className="size-8" />
             <Button
               type="button"
               variant="link"
@@ -140,89 +143,109 @@ export const DailyDeliveryTable = ({
                 onEdit(row.original);
               }}
             >
-              {row.original.customerName}
+              {row.original.moderatorName}
             </Button>
           </div>
         ),
       },
       {
-        accessorKey: "deliveryDate",
+        accessorKey: "createdAt",
         header: ({ column }) => <SortableHeader column={column} title="Date" />,
-        cell: ({ row }) => <span>{format(row.original.deliveryDate, "PPPP")}</span>,
+        cell: ({ row }) => <span>{format(row.original.createdAt, "PPPP")}</span>,
       },
       {
         id: "status",
-        accessorFn: (row) => (isDeliveryEditable(row) ? 1 : 0),
+        accessorFn: (row) => (row.done ? 0 : 1),
         header: ({ column }) => <SortableHeader column={column} title="Status" />,
         cell: ({ row }) => {
-          const editable = isDeliveryEditable(row.original);
+          const done = row.original.done;
 
           return (
             <Badge
               variant="outline"
-              className={editable ? "border-muted-foreground/40" : "border-emerald-500 text-emerald-600"}
+              className={done ? "border-emerald-500 text-emerald-600" : "border-muted-foreground/40"}
             >
               <HugeiconsIcon
-                icon={editable ? Loading03Icon : CheckmarkCircle03Icon}
+                icon={done ? CheckmarkCircle03Icon : Loading03Icon}
                 strokeWidth={2}
                 data-icon="inline-start"
-                className={editable ? "animate-spin text-muted-foreground" : "text-emerald-500"}
+                className={done ? "text-emerald-500" : "animate-spin text-muted-foreground"}
               />
-              {editable ? "Today's delivery" : "Done"}
+              {done ? "Done" : "Today's usage"}
             </Badge>
           );
         },
       },
       {
-        accessorKey: "moderatorName",
-        header: ({ column }) => <SortableHeader column={column} title="Moderator" />,
+        accessorKey: "revenue",
+        header: ({ column }) => <SortableHeader column={column} title="Revenue" />,
+        cell: ({ row }) => (
+          <span className="text-xs font-medium text-emerald-500">
+            {formatCurrency(row.original.revenue)}
+          </span>
+        ),
       },
       {
-        accessorKey: "payment",
-        header: ({ column }) => <SortableHeader column={column} title="Payment" />,
-        cell: ({ row }) => <span>{formatCurrency(row.original.payment)}</span>,
+        accessorKey: "expense",
+        header: ({ column }) => <SortableHeader column={column} title="Expense" />,
+        cell: ({ row }) => (
+          <span className="text-xs font-medium text-destructive">
+            {formatCurrency(row.original.expense)}
+          </span>
+        ),
       },
       {
-        accessorKey: "balance",
-        header: ({ column }) => <SortableHeader column={column} title="Balance" />,
-        cell: ({ row }) => {
-          if (row.original.balance > 0) {
-            return (
-              <span className="text-xs font-medium text-destructive">
-                {`Balance: ${formatCurrency(row.original.balance)}`}
-              </span>
-            );
-          }
-
-          if (row.original.balance < 0) {
-            return (
-              <span className="text-xs font-medium text-emerald-500">
-                {`Advance: ${formatCurrency(Math.abs(row.original.balance))}`}
-              </span>
-            );
-          }
-
-          return <span className="text-xs text-muted-foreground">Settled</span>;
-        },
-      },
-      {
-        accessorKey: "filledBottles",
+        accessorKey: "filled",
         header: ({ column }) => <SortableHeader column={column} title="Filled" />,
       },
       {
-        accessorKey: "emptyBottles",
+        accessorKey: "refilled",
+        header: ({ column }) => <SortableHeader column={column} title="Refilled" />,
+      },
+      {
+        accessorKey: "sales",
+        header: ({ column }) => <SortableHeader column={column} title="Sales" />,
+      },
+      {
+        accessorKey: "empty",
         header: ({ column }) => <SortableHeader column={column} title="Empty" />,
       },
       {
-        accessorKey: "damagedBottles",
+        accessorKey: "remaining",
+        header: ({ column }) => <SortableHeader column={column} title="Remaining" />,
+      },
+      {
+        id: "returned",
+        accessorFn: (row) => row.returned,
+        header: ({ column }) => <SortableHeader column={column} title="Returned" />,
+        cell: ({ row }) => (
+          <div className="flex min-w-32 flex-col gap-1 text-xs">
+            <span className="text-muted-foreground">{`Empty: ${row.original.emptyReturned}`}</span>
+            <span className="text-muted-foreground">{`Remaining: ${row.original.remainingReturned}`}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: "damaged",
         header: ({ column }) => <SortableHeader column={column} title="Damaged" />,
+      },
+      {
+        id: "caps",
+        accessorFn: (row) => row.capsTaken,
+        header: ({ column }) => <SortableHeader column={column} title="Caps" />,
+        cell: ({ row }) => (
+          <div className="flex min-w-24 flex-col gap-1 text-xs">
+            <span>{`Taken: ${row.original.capsTaken}`}</span>
+            <span className="text-muted-foreground">{`Used: ${row.original.capsUsed}`}</span>
+          </div>
+        ),
       },
     ],
     [onEdit],
   );
 
   const table = useReactTable({
-    data: statusFilteredData,
+    data: filteredData,
     columns,
     state: {
       sorting,
@@ -236,10 +259,7 @@ export const DailyDeliveryTable = ({
         return true;
       }
 
-      return (
-        row.original.customerName.toLowerCase().includes(query) ||
-        row.original.moderatorName.toLowerCase().includes(query)
-      );
+      return row.original.moderatorName.toLowerCase().includes(query);
     },
     initialState: {
       pagination: {
@@ -251,6 +271,10 @@ export const DailyDeliveryTable = ({
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
+  React.useEffect(() => {
+    table.setPageIndex(0);
+  }, [activityFilter, globalFilter, table]);
 
   return (
     <section className="w-full max-w-7xl overflow-x-hidden rounded-3xl border bg-card p-4 shadow-[inset_0_1px_4px_rgba(0,0,0,0.12)]">
@@ -264,7 +288,7 @@ export const DailyDeliveryTable = ({
         </div>
       </div>
 
-      <div className="mb-4 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative w-full max-w-sm">
             <HugeiconsIcon
@@ -277,23 +301,22 @@ export const DailyDeliveryTable = ({
               onChange={(event) => {
                 setGlobalFilter(event.target.value);
               }}
-              placeholder="Search by customer or moderator"
+              placeholder="Search by moderator"
               className="pl-9"
             />
           </div>
 
           <ToggleGroup
-            value={[statusFilter]}
+            value={[activityFilter]}
             onValueChange={(values) => {
-              const next = values.at(0) as DeliveryStatusFilter | undefined;
-              setStatusFilter(next ?? "all");
+              const next = values.at(0) as InventoryActivityFilter | undefined;
+              setActivityFilter(next ?? "all");
             }}
             variant="outline"
             size="sm"
           >
-            <ToggleGroupItem value="all">All</ToggleGroupItem>
-            <ToggleGroupItem value="today">Today's delivery</ToggleGroupItem>
-            <ToggleGroupItem value="done">Done</ToggleGroupItem>
+            <ToggleGroupItem value="all">All records</ToggleGroupItem>
+            <ToggleGroupItem value="nonZero">Non-zero activity</ToggleGroupItem>
           </ToggleGroup>
         </div>
         <Badge variant="outline" className="w-fit">{`${table.getFilteredRowModel().rows.length} records`}</Badge>
@@ -302,16 +325,16 @@ export const DailyDeliveryTable = ({
       {table.getRowModel().rows.length === 0 ? (
         <Empty className="border">
           <EmptyHeader>
-            <EmptyTitle>No deliveries found</EmptyTitle>
+            <EmptyTitle>No bottle usage records found</EmptyTitle>
             <EmptyDescription>
-              Try adjusting the search text or check back after entries are added.
+              Try adjusting search or check back after records are added.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (
         <>
           <div className="w-full overflow-x-auto">
-            <Table className="min-w-[1200px]">
+            <Table className="min-w-[1600px]">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>

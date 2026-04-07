@@ -25,8 +25,8 @@ const items = [
     icon: Home,
   },
   {
-    title: "Bottle Inventory",
-    url: "/admin/bottle-inventory",
+    title: "Inventory",
+    url: "/admin/inventory",
     icon: Inbox,
   },
   {

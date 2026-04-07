@@ -17,11 +17,13 @@ import { Route as ModeratorIndexRouteImport } from './routes/moderator/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AuthCallbackRouteImport } from './routes/_auth/callback'
 import { Route as AdminModeratorsRouteRouteImport } from './routes/admin/moderators/route'
+import { Route as AdminInventoryRouteRouteImport } from './routes/admin/inventory/route'
 import { Route as AdminExpensesRouteRouteImport } from './routes/admin/expenses/route'
 import { Route as AdminDeliveriesRouteRouteImport } from './routes/admin/deliveries/route'
 import { Route as AdminCustomersRouteRouteImport } from './routes/admin/customers/route'
 import { Route as ModeratorLoginIndexRouteImport } from './routes/moderator/login/index'
 import { Route as AdminModeratorsIndexRouteImport } from './routes/admin/moderators/index'
+import { Route as AdminInventoryIndexRouteImport } from './routes/admin/inventory/index'
 import { Route as AdminExpensesIndexRouteImport } from './routes/admin/expenses/index'
 import { Route as AdminDeliveriesIndexRouteImport } from './routes/admin/deliveries/index'
 import { Route as AdminDashboardIndexRouteImport } from './routes/admin/dashboard/index'
@@ -68,6 +70,11 @@ const AdminModeratorsRouteRoute = AdminModeratorsRouteRouteImport.update({
   path: '/moderators',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminInventoryRouteRoute = AdminInventoryRouteRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminExpensesRouteRoute = AdminExpensesRouteRouteImport.update({
   id: '/expenses',
   path: '/expenses',
@@ -92,6 +99,11 @@ const AdminModeratorsIndexRoute = AdminModeratorsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminModeratorsRouteRoute,
+} as any)
+const AdminInventoryIndexRoute = AdminInventoryIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminInventoryRouteRoute,
 } as any)
 const AdminExpensesIndexRoute = AdminExpensesIndexRouteImport.update({
   id: '/',
@@ -131,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/admin/customers': typeof AdminCustomersRouteRouteWithChildren
   '/admin/deliveries': typeof AdminDeliveriesRouteRouteWithChildren
   '/admin/expenses': typeof AdminExpensesRouteRouteWithChildren
+  '/admin/inventory': typeof AdminInventoryRouteRouteWithChildren
   '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/callback': typeof AuthCallbackRoute
   '/admin/': typeof AdminIndexRoute
@@ -141,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
   '/admin/deliveries/': typeof AdminDeliveriesIndexRoute
   '/admin/expenses/': typeof AdminExpensesIndexRoute
+  '/admin/inventory/': typeof AdminInventoryIndexRoute
   '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
@@ -155,6 +169,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardIndexRoute
   '/admin/deliveries': typeof AdminDeliveriesIndexRoute
   '/admin/expenses': typeof AdminExpensesIndexRoute
+  '/admin/inventory': typeof AdminInventoryIndexRoute
   '/admin/moderators': typeof AdminModeratorsIndexRoute
   '/moderator/login': typeof ModeratorLoginIndexRoute
 }
@@ -167,6 +182,7 @@ export interface FileRoutesById {
   '/admin/customers': typeof AdminCustomersRouteRouteWithChildren
   '/admin/deliveries': typeof AdminDeliveriesRouteRouteWithChildren
   '/admin/expenses': typeof AdminExpensesRouteRouteWithChildren
+  '/admin/inventory': typeof AdminInventoryRouteRouteWithChildren
   '/admin/moderators': typeof AdminModeratorsRouteRouteWithChildren
   '/_auth/callback': typeof AuthCallbackRoute
   '/admin/': typeof AdminIndexRoute
@@ -177,6 +193,7 @@ export interface FileRoutesById {
   '/admin/dashboard/': typeof AdminDashboardIndexRoute
   '/admin/deliveries/': typeof AdminDeliveriesIndexRoute
   '/admin/expenses/': typeof AdminExpensesIndexRoute
+  '/admin/inventory/': typeof AdminInventoryIndexRoute
   '/admin/moderators/': typeof AdminModeratorsIndexRoute
   '/moderator/login/': typeof ModeratorLoginIndexRoute
 }
@@ -189,6 +206,7 @@ export interface FileRouteTypes {
     | '/admin/customers'
     | '/admin/deliveries'
     | '/admin/expenses'
+    | '/admin/inventory'
     | '/admin/moderators'
     | '/callback'
     | '/admin/'
@@ -199,6 +217,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard/'
     | '/admin/deliveries/'
     | '/admin/expenses/'
+    | '/admin/inventory/'
     | '/admin/moderators/'
     | '/moderator/login/'
   fileRoutesByTo: FileRoutesByTo
@@ -213,6 +232,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/deliveries'
     | '/admin/expenses'
+    | '/admin/inventory'
     | '/admin/moderators'
     | '/moderator/login'
   id:
@@ -224,6 +244,7 @@ export interface FileRouteTypes {
     | '/admin/customers'
     | '/admin/deliveries'
     | '/admin/expenses'
+    | '/admin/inventory'
     | '/admin/moderators'
     | '/_auth/callback'
     | '/admin/'
@@ -234,6 +255,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard/'
     | '/admin/deliveries/'
     | '/admin/expenses/'
+    | '/admin/inventory/'
     | '/admin/moderators/'
     | '/moderator/login/'
   fileRoutesById: FileRoutesById
@@ -303,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminModeratorsRouteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/inventory': {
+      id: '/admin/inventory'
+      path: '/inventory'
+      fullPath: '/admin/inventory'
+      preLoaderRoute: typeof AdminInventoryRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/expenses': {
       id: '/admin/expenses'
       path: '/expenses'
@@ -337,6 +366,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/moderators/'
       preLoaderRoute: typeof AdminModeratorsIndexRouteImport
       parentRoute: typeof AdminModeratorsRouteRoute
+    }
+    '/admin/inventory/': {
+      id: '/admin/inventory/'
+      path: '/'
+      fullPath: '/admin/inventory/'
+      preLoaderRoute: typeof AdminInventoryIndexRouteImport
+      parentRoute: typeof AdminInventoryRouteRoute
     }
     '/admin/expenses/': {
       id: '/admin/expenses/'
@@ -432,6 +468,17 @@ const AdminExpensesRouteRouteChildren: AdminExpensesRouteRouteChildren = {
 const AdminExpensesRouteRouteWithChildren =
   AdminExpensesRouteRoute._addFileChildren(AdminExpensesRouteRouteChildren)
 
+interface AdminInventoryRouteRouteChildren {
+  AdminInventoryIndexRoute: typeof AdminInventoryIndexRoute
+}
+
+const AdminInventoryRouteRouteChildren: AdminInventoryRouteRouteChildren = {
+  AdminInventoryIndexRoute: AdminInventoryIndexRoute,
+}
+
+const AdminInventoryRouteRouteWithChildren =
+  AdminInventoryRouteRoute._addFileChildren(AdminInventoryRouteRouteChildren)
+
 interface AdminModeratorsRouteRouteChildren {
   AdminModeratorsIndexRoute: typeof AdminModeratorsIndexRoute
 }
@@ -447,6 +494,7 @@ interface AdminRouteRouteChildren {
   AdminCustomersRouteRoute: typeof AdminCustomersRouteRouteWithChildren
   AdminDeliveriesRouteRoute: typeof AdminDeliveriesRouteRouteWithChildren
   AdminExpensesRouteRoute: typeof AdminExpensesRouteRouteWithChildren
+  AdminInventoryRouteRoute: typeof AdminInventoryRouteRouteWithChildren
   AdminModeratorsRouteRoute: typeof AdminModeratorsRouteRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
   AdminDashboardIndexRoute: typeof AdminDashboardIndexRoute
@@ -456,6 +504,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminCustomersRouteRoute: AdminCustomersRouteRouteWithChildren,
   AdminDeliveriesRouteRoute: AdminDeliveriesRouteRouteWithChildren,
   AdminExpensesRouteRoute: AdminExpensesRouteRouteWithChildren,
+  AdminInventoryRouteRoute: AdminInventoryRouteRouteWithChildren,
   AdminModeratorsRouteRoute: AdminModeratorsRouteRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
   AdminDashboardIndexRoute: AdminDashboardIndexRoute,
