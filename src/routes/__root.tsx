@@ -7,7 +7,7 @@ import { shadcn } from "@clerk/themes"
 import appCss from "../styles.css?url"
 import { Toaster } from "@/components/ui/sonner"
 
-const SITE_NAME = `${process.env.NODE_ENV === "development" && "[DEV]"} Zainy Water v3`
+const SITE_NAME = `${process.env.NODE_ENV === "development" ? "[DEV] " : ""}Zainy Water v3`
 const SITE_DESCRIPTION =
   "Bottle supply management system for Zainy Water, built with TanStack Start"
 const SITE_URL = "https://zainy-water.vercel.app"
