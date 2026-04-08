@@ -48,7 +48,7 @@ const inventoryUsageFormSchema = z
     message: "Remaining bottles cannot exceed filled - returned bottles",
     path: ["remaining"],
   })
-  .refine((value) => value.empty_returned <= value.sales - value.remaining_returned, {
+  .refine((value) => value.empty_returned <= value.sales, {
     message: "Empty returned bottles cannot exceed sales",
     path: ["empty_returned"],
   })
