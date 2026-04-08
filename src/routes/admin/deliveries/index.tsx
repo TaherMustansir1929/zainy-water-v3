@@ -109,15 +109,10 @@ function countDeliveriesForLast30Days<T extends { deliveryDate: Date }>(
 }
 
 export const Route = createFileRoute("/admin/deliveries/")({
-  loader: async () => {
-    const [dailyDeliveries, miscDeliveries] = await Promise.all([
-      loadDailyDeliveries(),
-      loadMiscDeliveries(),
-    ]);
-
+  loader: () => {
     return {
-      dailyDeliveries,
-      miscDeliveries,
+      dailyDeliveries: loadDailyDeliveries(),
+      miscDeliveries: loadMiscDeliveries(),
     };
   },
   component: RouteComponent,
@@ -125,9 +120,11 @@ export const Route = createFileRoute("/admin/deliveries/")({
 
 function RouteComponent() {
   const {
-    dailyDeliveries: initialDailyDeliveries,
-    miscDeliveries: initialMiscDeliveries,
+    dailyDeliveries: dailyDeliveriesPromise,
+    miscDeliveries: miscDeliveriesPromise,
   } = Route.useLoaderData();
+  const initialDailyDeliveries = React.use(dailyDeliveriesPromise);
+  const initialMiscDeliveries = React.use(miscDeliveriesPromise);
 
   const [dailyDeliveries, setDailyDeliveries] = React.useState<Array<DailyDeliveryRecord>>(
     initialDailyDeliveries,

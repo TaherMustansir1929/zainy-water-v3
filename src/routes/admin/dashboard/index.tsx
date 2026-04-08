@@ -7,8 +7,8 @@ import { DashboardAnalyticsSection } from "./-ui/dashboard-analytics";
 import { LoadingState } from "@/components/web/loading-state";
 
 export const Route = createFileRoute("/admin/dashboard/")({
-  loader: async () => {
-    const analytics = await getDashboardAnalytics();
+  loader: () => {
+    const analytics = getDashboardAnalytics();
     return { analytics };
   },
   component: DashboardPage,
@@ -26,7 +26,7 @@ function DashboardPage() {
         greeting="Welcome"
       />
       <Suspense fallback={<LoadingState message="Loading dashboard analytics..." />}>
-        <DashboardAnalyticsSection analytics={analytics} />
+        <DashboardAnalyticsSection data={analytics} />
       </Suspense>
     </main>
   );

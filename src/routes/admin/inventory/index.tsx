@@ -128,15 +128,10 @@ function ScrambleNumber({ value }: { value: number }) {
 }
 
 export const Route = createFileRoute("/admin/inventory/")({
-  loader: async () => {
-    const [totalBottles, usageRecords] = await Promise.all([
-      loadTotalBottles(),
-      loadBottleUsageRecords(),
-    ]);
-
+  loader: () => {
     return {
-      totalBottles,
-      usageRecords,
+      totalBottles: loadTotalBottles(),
+      usageRecords: loadBottleUsageRecords(),
     };
   },
   component: RouteComponent,
@@ -144,9 +139,11 @@ export const Route = createFileRoute("/admin/inventory/")({
 
 function RouteComponent() {
   const {
-    totalBottles: initialTotalBottles,
-    usageRecords: initialUsageRecords,
+    totalBottles: totalBottlesPromise,
+    usageRecords: usageRecordsPromise,
   } = Route.useLoaderData();
+  const initialTotalBottles = React.use(totalBottlesPromise);
+  const initialUsageRecords = React.use(usageRecordsPromise);
 
   const [totalBottles, setTotalBottles] =
     React.useState<TotalBottlesRecord | null>(initialTotalBottles);

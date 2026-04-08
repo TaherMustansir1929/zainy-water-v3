@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/tanstack-react-start";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   text: string;
@@ -37,7 +38,21 @@ export const WelcomeSection = ({ text, greeting }: Props) => {
     setQuote(quotes_list[randomIndex]);
   }, [isLoaded]);
 
-  if (!isLoaded) return null;
+  if (!isLoaded) return (
+    <div className="w-full max-w-7xl border-b p-4">
+      <div className="mb-4">
+        <h1 className="mb-2 font-heading text-2xl font-bold md:text-4xl flex items-center gap-2">
+          {greeting ?? "Welcome"}
+        </h1>
+        <h2 className="text-xl">
+          <Skeleton className="h-6 w-48" />
+        </h2>
+      </div>
+      <p className="mb-6 text-xs text-muted-foreground md:text-sm">
+        <Skeleton className="h-5 w-1/2" />
+      </p>
+    </div>
+  );
 
   return (
     <div className="w-full max-w-7xl border-b p-4">

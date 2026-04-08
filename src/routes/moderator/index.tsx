@@ -2,16 +2,43 @@ import * as React from "react";
 import { Navigate, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
-import { getModeratorSession } from "./login/-server/modMiddleware.function";
 import { ModTabs } from "./-ui/mod-tabs";
+import {
+  getModeratorWorkspaceData,
+  type ModeratorWorkspaceData,
+} from "./-server/getModeratorWorkspaceData.function";
+import { getModeratorSession } from "./login/-server/modMiddleware.function";
 import { useModeratorSession } from "@/hooks/use-moderator-session";
 
 export const Route = createFileRoute('/moderator/')({
+  loader: () => {
+    return {
+      workspaceData: getModeratorWorkspaceData(),
+    };
+  },
   component: RouteComponent,
 })
 
+function ModeratorIndexContent({
+  workspaceData,
+}: {
+  workspaceData: Promise<ModeratorWorkspaceData>;
+}) {
+  const data = React.use(workspaceData);
+
+  return (
+    <section
+      className="flex min-h-screen flex-col justify-start gap-y-10 md:mt-4 md:items-center md:px-4"
+      data-workspace-loaded-at={data.loadedAt}
+    >
+      <ModTabs />
+    </section>
+  );
+}
+
 function RouteComponent() {
   const navigate = useNavigate();
+  const { workspaceData } = Route.useLoaderData();
   const {
     hasHydrated,
     isAuthenticated,
@@ -94,8 +121,14 @@ function RouteComponent() {
   }
 
   return (
-    <section className="flex min-h-screen flex-col justify-start gap-y-10 md:mt-4 md:items-center md:px-4">
-      <ModTabs />
-    </section>
+    <React.Suspense
+      fallback={(
+        <section className="flex min-h-[40vh] items-center justify-center px-4 text-sm text-muted-foreground">
+          Loading moderator workspace...
+        </section>
+      )}
+    >
+      <ModeratorIndexContent workspaceData={workspaceData} />
+    </React.Suspense>
   );
 }

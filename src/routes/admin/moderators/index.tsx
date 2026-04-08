@@ -756,16 +756,17 @@ function ModeratorDataTable({
 }
 
 export const Route = createFileRoute("/admin/moderators/")({
-  loader: async () => {
+  loader: () => {
     return {
-      moderators: await loadModeratorsWithMetrics(),
+      moderators: loadModeratorsWithMetrics(),
     };
   },
   component: ModeratorsRouteComponent,
 });
 
 function ModeratorsRouteComponent() {
-  const { moderators: initialModerators } = Route.useLoaderData();
+  const { moderators: moderatorsPromise } = Route.useLoaderData();
+  const initialModerators = React.use(moderatorsPromise);
 
   const [moderators, setModerators] = React.useState<Array<ModeratorWithMetrics>>(initialModerators);
   const [isLoading, setIsLoading] = React.useState(false);

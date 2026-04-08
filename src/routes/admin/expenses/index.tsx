@@ -50,16 +50,17 @@ function ScrambleNumber({ value }: { value: number }) {
 }
 
 export const Route = createFileRoute("/admin/expenses/")({
-  loader: async () => {
+  loader: () => {
     return {
-      expenses: await loadExpenses(),
+      expenses: loadExpenses(),
     };
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { expenses: initialExpenses } = Route.useLoaderData();
+  const { expenses: expensesPromise } = Route.useLoaderData();
+  const initialExpenses = React.use(expensesPromise);
 
   const [expenses, setExpenses] = React.useState<Array<AdminExpenseRecord>>(initialExpenses);
   const [isLoading, setIsLoading] = React.useState(false);

@@ -46,7 +46,7 @@ import {
 import { cn } from "@/lib/utils";
 
 type Props = {
-  analytics: DashboardAnalytics;
+  data: Promise<DashboardAnalytics>;
 };
 
 type MetricFormat = "currency" | "number";
@@ -122,7 +122,8 @@ function ScrambleValue({
   return <span className="tabular-nums font-heading text-3xl">{display}</span>;
 }
 
-export function DashboardAnalyticsSection({ analytics }: Props) {
+export function DashboardAnalyticsSection({ data }: Props) {
+  const analytics = React.use(data);
   const cardContent: Array<DashboardCard> = [
     {
       id: "total_revenue",
